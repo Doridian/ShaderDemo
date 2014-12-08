@@ -19,6 +19,7 @@ import de.doridian.crtdemo.basic.tokens.io.PRINTToken;
 import de.doridian.crtdemo.basic.tokens.misc.ENDToken;
 import de.doridian.crtdemo.basic.tokens.misc.LETToken;
 import de.doridian.crtdemo.basic.tokens.misc.REMToken;
+import de.doridian.crtdemo.basic.tokens.misc.SLEEPToken;
 import org.lwjgl.Sys;
 
 import java.lang.annotation.ElementType;
@@ -76,6 +77,7 @@ public abstract class AbstractToken {
         addToken(REMToken.class);
         addToken(ENDToken.class);
         addToken(LETToken.class);
+        addToken(SLEEPToken.class);
     }
 
     private static void addToken(Class<? extends AbstractToken> tokenClass) {

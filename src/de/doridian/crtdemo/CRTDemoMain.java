@@ -79,8 +79,10 @@ public class CRTDemoMain extends OpenGLMain {
 	private static int cursorX = 0, cursorY = 0;
 
 	public static synchronized void refreshCursor() {
-		screenCursorOn[cursorY][cursorX] = screenCursorOff[cursorY][cursorX];
-		screenCursorOn[posY][posX] = '\u00DC';
+		if(cursorY < 16)
+			screenCursorOn[cursorY][cursorX] = screenCursorOff[cursorY][cursorX];
+		if(posY < 16)
+			screenCursorOn[posY][posX] = '\u00DC';
 		cursorX = posX;
 		cursorY = posY;
 		refreshScreen();
@@ -93,7 +95,7 @@ public class CRTDemoMain extends OpenGLMain {
 			screenCursorOff[i - 1] = screenCursorOff[i];
 			System.arraycopy(screenCursorOff[i], 0, screenCursorOn[i - 1], 0, 32);
 		}
-		blankLine(31);
+		blankLine(15);
 		refreshCursor();
 	}
 
@@ -109,8 +111,12 @@ public class CRTDemoMain extends OpenGLMain {
 		}
 
 		@Override
-		public void print(Object obj) {
+		public synchronized void print(Object obj) {
 			for(char c : obj.toString().toCharArray()) {
+				if(c == '\r' || c == '\n') {
+					nextLine();
+					continue;
+				}
 				writeChar(c);
 				moveForward();
 			}
