@@ -262,7 +262,10 @@ public abstract class AbstractToken {
     }
 
     public String getCode() {
-        return getCode("\t\t");
+        String code = getCode("\t\t");
+        if(code == null || code.isEmpty())
+            return null;
+        return code;
     }
 
     public abstract String getCode(String prefix);

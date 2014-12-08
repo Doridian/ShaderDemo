@@ -6,6 +6,6 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class NOOPToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        return null;
+        return " ";
     }
 }
