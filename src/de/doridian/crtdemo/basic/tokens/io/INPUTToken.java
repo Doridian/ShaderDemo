@@ -2,7 +2,7 @@ package de.doridian.crtdemo.basic.tokens.io;
 
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName(value = "INPUT")
+@AbstractToken.TokenName("INPUT")
 public class INPUTToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {

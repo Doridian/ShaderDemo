@@ -2,7 +2,7 @@ package de.doridian.crtdemo.basic.tokens.io;
 
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName(value = "AT")
+@AbstractToken.TokenName("AT")
 public class ATToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
