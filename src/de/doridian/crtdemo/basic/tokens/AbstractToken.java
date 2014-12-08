@@ -1,5 +1,6 @@
 package de.doridian.crtdemo.basic.tokens;
 
+import com.sun.javafx.fxml.expression.Expression;
 import de.doridian.crtdemo.basic.BasicProgram;
 import de.doridian.crtdemo.basic.parameters.*;
 import de.doridian.crtdemo.basic.tokens.flow.GOTOToken;
@@ -89,7 +90,7 @@ public abstract class AbstractToken {
         }
     }
 
-    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE) public @interface TokenName { String[] value(); };
+    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE) public @interface TokenName { String[] value(); boolean ignoreParameters() default false; };
 
     public static class CompilerException extends RuntimeException {
         public CompilerException(String message) {
@@ -252,9 +253,13 @@ public abstract class AbstractToken {
         this.program = program;
         this.line = line;
 
-        this.parametersSplitDetailed = parseParameters(parameters);
-
-        this.parametersRaw = parameters;
+        if(this.getClass().getAnnotation(TokenName.class).ignoreParameters()) {
+            this.parametersSplitDetailed = new AbstractParameter[0];
+            this.parametersRaw = "";
+        } else {
+            this.parametersSplitDetailed = parseParameters(parameters);
+            this.parametersRaw = parameters;
+        }
     }
 
     public void insert()  {
