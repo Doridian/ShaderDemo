@@ -18,10 +18,16 @@ public class BasicProgram {
     private String variableCode = "";
     private String functionCode = "";
 
+    private final boolean debug;
+
     private int entryPoint = -1;
 
     private TreeSet<Float> lineNumbers = new TreeSet<Float>();
     private HashSet<String> definedVariables = new HashSet<String>();
+
+    public BasicProgram(boolean debug) {
+        this.debug = debug;
+    }
 
     public void addVariable(String varName) {
         int dollarIdx = varName.indexOf('$');
@@ -91,6 +97,8 @@ public class BasicProgram {
     public BaseCompiledProgram compile() {
         String className = "CompileResult$$" + (++COMPILE_CTR);
         String code = getCode(className);
+        if(debug)
+            Util.writeFile("data/tmp/test.java", code);
         File classFile = new File(className + ".class");
         classFile.delete();
 

@@ -10,13 +10,15 @@ import java.util.Objects;
 
 public class CodeParser {
     private final String[] lines;
+    private final boolean debug;
 
-    public CodeParser(String code) {
+    public CodeParser(String code, boolean debug) {
         lines = code.split("[\r\n]+");
+        this.debug = debug;
     }
 
     public BaseCompiledProgram compile() {
-        BasicProgram program = new BasicProgram();
+        BasicProgram program = new BasicProgram(debug);
         for(int i = 0; i < lines.length; i++) {
             String line = lines[i];
             if(line.charAt(0) == '#' || line.isEmpty())
@@ -46,9 +48,7 @@ public class CodeParser {
     public static void main(String[] args) {
         final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
-        BaseCompiledProgram compiledProgram = new CodeParser(Util.readFile("data/tmp/test.basic")).compile();
-
-        Util.writeFile("data/tmp/test.java", compiledProgram.$getSourceCode());
+        BaseCompiledProgram compiledProgram = new CodeParser(Util.readFile("data/tmp/test.basic"), true).compile();
 
         compiledProgram.$start(new BasicIO() {
             @Override
