@@ -9,7 +9,7 @@ public abstract class BaseCompiledProgram {
     protected Float $nextLinePointer = null;
     protected boolean $cleanExit = false;
 
-    protected final int $entryPoint;
+    protected final float $entryPoint;
 
     protected final TreeSet<Float> $lineNumbers;
     protected final HashMap<Float, Method> $lineMethods;
@@ -35,13 +35,10 @@ public abstract class BaseCompiledProgram {
     protected ConcurrentLinkedQueue<Integer> $callQueue = null;
     protected ConcurrentLinkedQueue<LoopLines> $loopQueue = null;
 
-    //private final Class<? extends BaseCompiledProgram> $clazz;
-
-    protected BaseCompiledProgram(Class<? extends BaseCompiledProgram> clazz, int entryPoint) {
+    protected BaseCompiledProgram(Class<? extends BaseCompiledProgram> clazz, float entryPoint) {
         $entryPoint = entryPoint;
-        //$clazz = clazz;
-        $lineNumbers = new TreeSet<Float>();
-        $lineMethods = new HashMap<Float, Method>();
+        $lineNumbers = new TreeSet<>();
+        $lineMethods = new HashMap<>();
 
         for(Method m : clazz.getDeclaredMethods()) {
             String mName = m.getName();
@@ -53,14 +50,19 @@ public abstract class BaseCompiledProgram {
         }
     }
 
+    protected void $addNoopLine(float line) {
+        $lineNumbers.add(line);
+        $lineMethods.put(line, null);
+    }
+
     public synchronized void $start(BasicIO io) {
         this.$io = io;
         float line = 0;
 
-        this.$callQueue = new ConcurrentLinkedQueue<Integer>();
-        this.$loopQueue = new ConcurrentLinkedQueue<LoopLines>();
+        this.$callQueue = new ConcurrentLinkedQueue<>();
+        this.$loopQueue = new ConcurrentLinkedQueue<>();
 
-        $nextLinePointer = (float)$entryPoint;
+        $nextLinePointer = $entryPoint;
         try {
             while ((line = $runNextLine()) >= 0);
             if(!$cleanExit)
@@ -88,7 +90,9 @@ public abstract class BaseCompiledProgram {
         if(runLine == null)
             return -1.0f;
         $nextLinePointer = $lineNumbers.higher($nextLinePointer);
-        $lineMethods.get(runLine).invoke(this);
+        Method lineMethod = $lineMethods.get(runLine);
+        if(lineMethod != null)
+            lineMethod.invoke(this);
         return runLine;
     }
 }

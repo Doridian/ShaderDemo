@@ -19,9 +19,10 @@ public class BasicProgram {
 
     private final boolean debug;
 
-    private int entryPoint = -1;
+    private float entryPoint = -1;
 
     private TreeSet<Float> lineNumbers = new TreeSet<Float>();
+    private HashSet<Float> noopLines = new HashSet<Float>();
     private HashSet<String> definedVariables = new HashSet<String>();
 
     public BasicProgram(boolean debug) {
@@ -128,17 +129,30 @@ public class BasicProgram {
         return null;
     }
 
+    public void addNoopLine(float line) {
+        lineNumbers.add(line);
+        noopLines.add(line);
+    }
+
     public void addLine(float line, String code) {
         if(entryPoint < 0)
-            entryPoint = (int)line;
+            entryPoint = line;
         lineNumbers.add(line);
         functionCode += "\tpublic void $LINE_" + (""+line).replace('.', '_') + "() {\n" + code + "\n\t}\n";
+    }
+
+    public String parseNoopLines() {
+        StringBuilder ret = new StringBuilder();
+        for(Float line : noopLines) {
+            ret.append("\t\t$addNoopLine(" + line + "f);\n");
+        }
+        return ret.toString();
     }
 
     private String getCode(String className) {
         return  "import static de.doridian.crtdemo.basic.BasicFunctions.*;\n\n" +
                 "public class " + className + " extends de.doridian.crtdemo.basic.BaseCompiledProgram { \n" +
-                "\tpublic " + className + "() {\n\t\tsuper(" + className + ".class, " + entryPoint + ");\n\t}\n\n" +
+                "\tpublic " + className + "() {\n\t\tsuper(" + className + ".class, " + entryPoint + "f);\n" + parseNoopLines() + "\t}\n\n" +
                 variableCode + "\n" +
                 functionCode +
                 "}";

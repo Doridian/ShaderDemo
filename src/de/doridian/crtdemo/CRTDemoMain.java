@@ -139,14 +139,16 @@ public class CRTDemoMain extends OpenGLMain {
 
 		CodeParser parser = new CodeParser(Util.readFile("data/tmp/test.basic"), true);
 		final BaseCompiledProgram program = parser.compile();
-		new Thread() {
+		Thread basicThread = new Thread() {
 			public void run() {
 				BasicIO io = new CRTBasicIO();
 				program.$start(io);
 				nextLine();
 				io.print("--- PROGRAM TERMINATED ---");
 			}
-		}.start();
+		};
+		basicThread.setDaemon(true);
+		basicThread.start();
 
 		OpenGLMain.main(new Renderer() {
 			private AngelCodeFont font;
