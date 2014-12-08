@@ -186,6 +186,7 @@ public class CRTDemoMain extends OpenGLMain {
 					inputQueue.add(promptInput);
 					promptInput = "";
 					nextLine();
+					promptInputAllowed--;
 					return;
 				}
 
