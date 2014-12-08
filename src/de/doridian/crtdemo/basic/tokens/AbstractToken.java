@@ -2,7 +2,8 @@ package de.doridian.crtdemo.basic.tokens;
 
 import de.doridian.crtdemo.basic.BasicProgram;
 import de.doridian.crtdemo.basic.parameters.*;
-import de.doridian.crtdemo.basic.tokens.flow.*;
+import de.doridian.crtdemo.basic.tokens.flow.GOTOToken;
+import de.doridian.crtdemo.basic.tokens.flow.IFToken;
 import de.doridian.crtdemo.basic.tokens.flow.do_loop_loop.DOToken;
 import de.doridian.crtdemo.basic.tokens.flow.do_loop_loop.LOOPToken;
 import de.doridian.crtdemo.basic.tokens.flow.for_next_loop.FORToken;
@@ -20,13 +21,11 @@ import de.doridian.crtdemo.basic.tokens.misc.ENDToken;
 import de.doridian.crtdemo.basic.tokens.misc.LETToken;
 import de.doridian.crtdemo.basic.tokens.misc.REMToken;
 import de.doridian.crtdemo.basic.tokens.misc.SLEEPToken;
-import org.lwjgl.Sys;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;

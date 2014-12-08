@@ -1,7 +1,6 @@
 package de.doridian.crtdemo.basic.tokens.flow;
 
 import de.doridian.crtdemo.basic.parameters.AbstractParameter;
-import de.doridian.crtdemo.basic.parameters.RawStringParameter;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
 @AbstractToken.TokenName("IF")

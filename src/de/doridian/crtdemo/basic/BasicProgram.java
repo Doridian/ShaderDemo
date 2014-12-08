@@ -2,7 +2,6 @@ package de.doridian.crtdemo.basic;
 
 import de.doridian.crtdemo.Util;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
-import org.lwjgl.Sys;
 
 import javax.tools.*;
 import java.io.*;

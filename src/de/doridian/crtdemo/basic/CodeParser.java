@@ -6,7 +6,6 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Objects;
 
 public class CodeParser {
     private final String[] lines;
