@@ -1,6 +1,7 @@
 package de.doridian.crtdemo;
 
 import de.doridian.crtdemo.basic.BaseCompiledProgram;
+import de.doridian.crtdemo.basic.BasicFunctions;
 import de.doridian.crtdemo.basic.BasicIO;
 import de.doridian.crtdemo.basic.CodeParser;
 import de.doridian.crtdemo.shader.MainShader;
@@ -46,13 +47,13 @@ public class CRTDemoMain extends OpenGLMain {
 		StringBuilder sbCursorOn = new StringBuilder();
 		StringBuilder sbCursorOff = new StringBuilder();
 		for(int i = 0; i < 16; i++) {
-			sbCursorOn.append(new String(screenCursorOn[i]).trim());
+			sbCursorOn.append(BasicFunctions.RTRIM$(new String(screenCursorOn[i])));
 			sbCursorOn.append('\n');
-			sbCursorOff.append(new String(screenCursorOff[i]).trim());
+			sbCursorOff.append(BasicFunctions.RTRIM$(new String(screenCursorOff[i])));
 			sbCursorOff.append('\n');
 		}
-		stringCursorOn = sbCursorOn.toString().trim();
-		stringCursorOff = sbCursorOff.toString().trim();
+		stringCursorOn = BasicFunctions.RTRIM$(sbCursorOn.toString());
+		stringCursorOff = BasicFunctions.RTRIM$(sbCursorOff.toString());
 	}
 
 	public static void writeChar(char c) {
