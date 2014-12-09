@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -99,15 +100,21 @@ public class BasicProgram {
         String code = getCode(className);
         if(debug)
             Util.writeFile("data/tmp/test.java", code);
-        File classFile = new File(className + ".class");
+        File destDir = new File("data/compiled");
+        destDir.mkdirs();
+        File classFile = new File(destDir, className + ".class");
         classFile.delete();
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+
         JavaFileObject jfo = new StringSourceJavaFileObject(className, code);
-        ArrayList<JavaFileObject> jfoList = new ArrayList<JavaFileObject>();
+        ArrayList<JavaFileObject> jfoList = new ArrayList<>();
         jfoList.add(jfo);
-        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, null, null, jfoList);
+
+        Iterable<String> options = Arrays.asList("-d", destDir.getAbsolutePath());
+        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options, null, jfoList);
+
         task.call();
 
         for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
@@ -115,7 +122,7 @@ public class BasicProgram {
         }
 
         try {
-            URLClassLoader subClassLoader = new URLClassLoader(new URL[] { new File(".").toURI().toURL() }, Thread.currentThread().getContextClassLoader());
+            URLClassLoader subClassLoader = new URLClassLoader(new URL[] { destDir.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
             BaseCompiledProgram compileResult = (BaseCompiledProgram) subClassLoader.loadClass(className).getConstructor().newInstance();
             compileResult.$sourceCode = code;
             return compileResult;
