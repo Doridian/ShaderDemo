@@ -9,7 +9,7 @@ public class Cluster {
     public final static short HEADER_SIZE = 1 + 2;
 
     final FileSystem fileSystem;
-    final int location; //unsigned short
+    public final int location; //unsigned short
 
     int attributes; //unsigned byte [Allocated, IsFirst, (Directory, ReadOnly)] Brackets = only first cluster
     int nextCluster; //0 for none

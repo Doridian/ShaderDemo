@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 public class AbstractData extends SimpleDataInputOutput implements Closeable {
-    Cluster attributeCluster;
-    FileSystem fileSystem;
+    public Cluster attributeCluster;
+    protected FileSystem fileSystem;
     String name;
 
     protected TreeMap<Integer, byte[]> dataClustersDirty = new TreeMap<>();
     protected boolean attributesDirty;
 
-    int currentPos = 0;
+    private int currentPos = 0;
 
     protected int getSetAttributes() {
         return 0;
@@ -98,7 +98,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
     }
 
     @Override
-    public long getFilePointer() throws IOException {
+    public int getFilePointer() throws IOException {
         return currentPos;
     }
 

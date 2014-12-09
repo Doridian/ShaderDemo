@@ -22,7 +22,8 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      */
     public int read() throws IOException {
         byte[] b = new byte[1];
-        readFully(b);
+        if(readBytes(b, 0, 1) < 1)
+            return -1;
         return (b[0] & 0xFF);
     }
 
@@ -213,7 +214,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      *             at which the next read or write occurs.
      * @exception  IOException  if an I/O error occurs.
      */
-    public abstract  long getFilePointer() throws IOException;
+    public abstract int getFilePointer() throws IOException;
 
     /**
      * Sets the file-pointer offset, measured from the beginning of this
