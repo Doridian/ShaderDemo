@@ -8,15 +8,13 @@ public class Cluster {
     public final static short FILE_NAME_SIZE = 8 + 1 + 3;
     public final static short HEADER_SIZE = 1 + 2;
 
-    private final FileSystem fileSystem;
+    final FileSystem fileSystem;
     final int location; //unsigned short
 
     int attributes; //unsigned byte [Allocated, IsFirst, (Directory, ReadOnly)] Brackets = only first cluster
     int nextCluster; //0 for none
 
-    public byte[] contents;
-
-    private boolean headRead = false, dataRead = false, attributesRead = false;
+    private boolean headRead = false, attributesRead = false;
 
     //First cluster only
     public String name; //8 bytes + '.' + 3 bytes
@@ -26,43 +24,46 @@ public class Cluster {
         this.fileSystem = fileSystem;
     }
 
-    public void read(DataInput data) throws IOException {
-        if(dataRead)
-            return;
+    public byte[] read() throws IOException {
         headRead = false;
-        readHead(data);
-        int dataSize = data.readUnsignedShort();
-        contents = new byte[dataSize];
-        data.readFully(contents);
-        dataRead = true;
+        readHead();
+        int dataSize = fileSystem.randomAccessFile.readUnsignedShort();
+        byte[] contents = new byte[dataSize];
+        fileSystem.randomAccessFile.readFully(contents);
+        return contents;
     }
 
-    public void readHead(DataInput data) throws IOException {
+    public void readHead() throws IOException {
         if(headRead)
             return;
         attributesRead = false;
-        nextCluster = data.readUnsignedShort();
+        readAttributes();
+        nextCluster = fileSystem.randomAccessFile.readUnsignedShort();
         headRead = true;
     }
 
-    public void readAttributes(DataInput data) throws IOException {
+    public void readAttributes() throws IOException {
         if(attributesRead)
             return;
         fileSystem.seekToCluster(this);
-        attributes = data.readUnsignedByte();
+        attributes = fileSystem.randomAccessFile.readUnsignedByte();
         attributesRead = true;
     }
 
-    public void write(DataOutput data) throws IOException {
-        writeAttributes(data);
-        data.writeShort(nextCluster);;
-        data.writeShort(contents.length);
-        data.write(contents, 0, contents.length);
+    public void write(byte[] contents) throws IOException {
+        writeHead();
+        fileSystem.randomAccessFile.writeShort(contents.length);
+        fileSystem.randomAccessFile.write(contents, 0, contents.length);
     }
 
-    public void writeAttributes(DataOutput data) throws IOException {
+    public void writeAttributes() throws IOException {
         fileSystem.seekToCluster(this);
-        data.writeByte(attributes);
+        fileSystem.randomAccessFile.writeByte(attributes);
+    }
+
+    public void writeHead() throws IOException {
+        writeAttributes();
+        fileSystem.randomAccessFile.writeShort(nextCluster);;
     }
 
     public boolean isAttribute(int attribute) {
