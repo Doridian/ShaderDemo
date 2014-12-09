@@ -370,8 +370,8 @@ public abstract class AbstractToken {
     public static void validateVarFuncName(String name) {
         if(name.charAt(0) == '$')
             throw new SyntaxException("$ NOT ALLOWED AT START OF FUNC OR VAR");
-        if(name.indexOf('.') >= 0)
-            throw new SyntaxException(". NOT ALLOWED IN FUNC OR VAR");
+        if(name.indexOf('.') >= 0 || name.indexOf('{') >= 0 || name.indexOf('}') >= 0)
+            throw new SyntaxException("./{/} NOT ALLOWED IN FUNC OR VAR");
     }
 
     public static void validateParameter(AbstractParameter parameter) {
