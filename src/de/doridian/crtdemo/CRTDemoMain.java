@@ -114,7 +114,11 @@ public class CRTDemoMain extends OpenGLMain {
 		@Override
 		public synchronized void print(Object obj) {
 			for(char c : obj.toString().toCharArray()) {
-				if(c == '\r' || c == '\n') {
+				if(c == '\r') {
+					posX = 0;
+					continue;
+				}
+				if(c == '\n') {
 					nextLine();
 					continue;
 				}

@@ -66,7 +66,7 @@ public abstract class BaseCompiledProgram {
         try {
             while ((line = $runNextLine()) >= 0);
             if(!$cleanExit)
-                io.print("\nEND OF PROGRAM REACHED WITHOUT END STATEMENT\n");
+                io.print("\n---END OF PROGRAM REACHED WITHOUT END STATEMENT---\n");
         } catch (Exception e) {
             e.printStackTrace();
             io.print("\nERROR ON LINE " + line + ": " + e.getMessage() + "\n");
