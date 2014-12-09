@@ -1,9 +1,10 @@
 package de.doridian.crtdemo.simfs;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.TreeMap;
 
-public class AbstractData extends SimpleDataInputOutput {
+public class AbstractData extends SimpleDataInputOutput implements Closeable {
     Cluster attributeCluster;
     FileSystem fileSystem;
     String name;
@@ -104,5 +105,10 @@ public class AbstractData extends SimpleDataInputOutput {
     @Override
     public void seek(long pos) throws IOException {
         currentPos = (int)pos;
+    }
+
+    @Override
+    public void close() throws IOException {
+        flush();
     }
 }
