@@ -86,7 +86,7 @@ public abstract class AbstractToken {
             for(String name : tokenClass.getAnnotation(TokenName.class).value())
                 tokens.put(name.toUpperCase(), tokenCtor);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
