@@ -74,33 +74,73 @@ public class FileSystem {
         return data;
     }
 
+    public void deleteData(AbstractData data) throws IOException {
+        if(data.attributeCluster != null)
+            deallocateCluster(data.attributeCluster);
+
+        if(data.firstDataCluster != null)
+            deallocateCluster(data.firstDataCluster);
+
+        data.attributeCluster = null;
+        data.firstDataCluster = null;
+    }
+
     public void writeData(AbstractData data) throws IOException {
         if(data.attributeCluster == null || data.firstDataCluster == null) {
-            if(data.attributeCluster != null)
-                deallocateCluster(data.attributeCluster);
-
-            if(data.firstDataCluster != null)
-                deallocateCluster(data.firstDataCluster);
+            deleteData(data);
 
             data.attributesDirty = true;
-            data.dataDirty = true;
+            data.allDataDirty = true;
 
             data.attributeCluster = allocateCluster();
             data.attributeCluster.setAttribute(Cluster.ATTRIBUTE_FIRST, true);
-            data.attributeCluster.setAttribute(data.getSetAttributes(), true);
-            data.firstDataCluster = allocateCluster();
-            data.attributeCluster.nextCluster = data.firstDataCluster.location;
+            data.attributeCluster.setAttribute(data.getSetAttributes(), true);;
         }
 
         if(data.attributesDirty) {
-            data.attributeCluster.read(randomAccessFile);
+            data.attributeCluster.readHead(randomAccessFile);
             data.attributeCluster.contents = data.name.getBytes("ASCII");
             data.attributeCluster.write(randomAccessFile);
         }
 
-        if(data.dataDirty) {
-            data.firstDataCluster.read(randomAccessFile);
-            data.firstDataCluster.write(randomAccessFile);
+        if(data.allDataDirty || !data.dataClustersDirty.isEmpty()) {
+            byte[] contents = data.getContents();
+            int clusterCount = (int)Math.ceil(((double)contents.length) / ((double)clusterSize));
+
+            Cluster currentCluster = data.attributeCluster;
+            currentCluster.readHead(randomAccessFile);
+
+            if(clusterCount < 1)
+                clusterCount = 1;
+
+            for(int clusterNumber = 0; clusterNumber < clusterCount; clusterNumber++) {
+                if(currentCluster.nextCluster > 0) {
+                    currentCluster = getCluster(currentCluster.nextCluster);
+                    currentCluster.readHead(randomAccessFile);
+                } else {
+                    Cluster newCluster = allocateCluster();
+
+                    if(currentCluster.location == data.attributeCluster.location)
+                        data.firstDataCluster = newCluster;
+
+                    currentCluster.nextCluster = newCluster.location;
+                    currentCluster = newCluster;
+                }
+
+                if(data.allDataDirty || data.dataClustersDirty.contains(clusterNumber)) {
+                    int pos = clusterNumber * clusterSize;
+                    int len = Math.min(clusterSize, contents.length - pos);
+                    if (len < 0)
+                        len = 0;
+                    currentCluster.contents = new byte[len];
+                    System.arraycopy(contents, pos, currentCluster.contents, 0, len);
+                    currentCluster.write(randomAccessFile);
+                }
+            }
         }
+
+        data.allDataDirty = false;
+        data.attributesDirty = false;
+        data.dataClustersDirty.clear();
     }
 }
