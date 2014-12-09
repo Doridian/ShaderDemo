@@ -83,14 +83,13 @@ public class FileSystem {
 
         data.attributeCluster = null;
         data.firstDataCluster = null;
+        data.allDataDirty = true;
+        data.attributesDirty = true;
     }
 
     public void writeData(AbstractData data) throws IOException {
         if(data.attributeCluster == null || data.firstDataCluster == null) {
             deleteData(data);
-
-            data.attributesDirty = true;
-            data.allDataDirty = true;
 
             data.attributeCluster = allocateCluster();
             data.attributeCluster.setAttribute(Cluster.ATTRIBUTE_FIRST, true);
@@ -114,6 +113,8 @@ public class FileSystem {
                 clusterCount = 1;
 
             for(int clusterNumber = 0; clusterNumber < clusterCount; clusterNumber++) {
+                boolean forceWriteThisCluster = false;
+
                 if(currentCluster.nextCluster > 0) {
                     currentCluster = getCluster(currentCluster.nextCluster);
                     currentCluster.readHead(randomAccessFile);
@@ -125,9 +126,11 @@ public class FileSystem {
 
                     currentCluster.nextCluster = newCluster.location;
                     currentCluster = newCluster;
+
+                    forceWriteThisCluster = true;
                 }
 
-                if(data.allDataDirty || data.dataClustersDirty.contains(clusterNumber)) {
+                if(data.allDataDirty || forceWriteThisCluster || data.dataClustersDirty.contains(clusterNumber)) {
                     int pos = clusterNumber * clusterSize;
                     int len = Math.min(clusterSize, contents.length - pos);
                     if (len < 0)
