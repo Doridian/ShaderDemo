@@ -12,14 +12,43 @@ public class FileSystem {
     public final int clusterSize; //unsigned byte
     public final int numClusters; //unsigned short
 
-    RandomAccessFile randomAccessFile;
+    final RandomAccessFile randomAccessFile;
 
     public final DirectoryData rootDirectory;
 
-    public FileSystem(short clusterSize, int numClusters, DirectoryData rootDirectory) {
+    private FileSystem(int clusterSize, int numClusters, RandomAccessFile file, boolean rootDirectoryExists) throws IOException {
         this.clusterSize = clusterSize;
         this.numClusters = numClusters;
+        this.randomAccessFile = file;
+
+        DirectoryData rootDirectory;
+        if(rootDirectoryExists) {
+            rootDirectory = (DirectoryData)readData(0);
+        } else {
+            rootDirectory = new DirectoryData();
+            deleteData(rootDirectory);
+
+            rootDirectory.attributesDirty = true;
+            rootDirectory.attributeCluster = getCluster(0);
+            rootDirectory.setName("ROOT");
+
+            writeData(rootDirectory);
+        }
         this.rootDirectory = rootDirectory;
+    }
+
+    public static FileSystem create(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
+        file.setLength(clusterSize * numClusters);
+        file.seek(0);
+        file.writeByte(clusterSize);
+        file.writeShort(numClusters);
+        return new FileSystem(clusterSize, numClusters, file, false);
+    }
+
+    public static FileSystem read(RandomAccessFile file) throws IOException {
+        int clusterSize = file.readUnsignedByte();
+        int numClusters = file.readUnsignedShort();
+        return new FileSystem(clusterSize, numClusters, file, true);
     }
 
     void seekToCluster(Cluster cluster) throws IOException {
