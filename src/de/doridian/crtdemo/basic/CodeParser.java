@@ -26,18 +26,22 @@ public class CodeParser {
             Class<? extends AbstractToken> endingToken = token.getEndingToken();
             if(endingToken != null) {
                 int nestings = 0;
+                boolean tokenFound = false;
                 for(int j = i + 1; j < lines.length; j++) {
                     String innerLine = lines[j];
                     AbstractToken innerToken = AbstractToken.parseLine(program, innerLine);
                     if(endingToken.isAssignableFrom(innerToken.getClass())) {
                         if(nestings-- == 0) {
                             token.setEndingToken(innerToken);
+                            tokenFound = true;
                             break;
                         }
                     } else if(endingToken.isAssignableFrom(token.getClass())) {
                         nestings++;
                     }
                 }
+                if(!tokenFound)
+                    throw new AbstractToken.SyntaxException("UNEXPECTED EOF");
             }
             token.insert();
         }

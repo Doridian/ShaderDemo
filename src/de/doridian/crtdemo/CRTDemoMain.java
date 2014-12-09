@@ -147,8 +147,6 @@ public class CRTDemoMain extends OpenGLMain {
 			public void run() {
 				BasicIO io = new CRTBasicIO();
 				program.$start(io);
-				nextLine();
-				io.print("--- PROGRAM TERMINATED ---");
 			}
 		};
 		basicThread.setDaemon(true);

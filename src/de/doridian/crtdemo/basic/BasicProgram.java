@@ -117,9 +117,14 @@ public class BasicProgram {
 
         task.call();
 
+        boolean hasError = false;
         for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
             System.err.println(diagnostic.getLineNumber() + ": " + diagnostic.getMessage(null));
+            hasError = true;
         }
+
+        if(hasError)
+            return null;
 
         try {
             URLClassLoader subClassLoader = new URLClassLoader(new URL[] { destDir.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
