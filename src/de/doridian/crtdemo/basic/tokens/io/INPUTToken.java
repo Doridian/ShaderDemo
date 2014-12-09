@@ -8,9 +8,8 @@ public class INPUTToken extends AbstractToken {
     public String getCode(String prefix) {
         String ret = "";
 
-        String variable = parametersSplitDetailed[parametersSplitDetailed.length - 1].getAsParameter();
+        String variable = parametersSplitDetailed[parametersSplitDetailed.length - 1].subParams[0].getAsParameter();
         program.addVariable(variable);
-
 
         String func = " = $io.getLine();";
         if(variable.charAt(variable.length() - 1) != '$')
@@ -18,7 +17,7 @@ public class INPUTToken extends AbstractToken {
 
         if(parametersSplitDetailed.length > 1)
             for(int i = 0; i < parametersSplitDetailed.length - 1; i++)
-                ret += prefix + "$io.print(" + parametersSplitDetailed[i] + ");\n";
+                ret += prefix + "$io.print(" + parametersSplitDetailed[i].getAsParameter() + ");\n";
 
         return ret + prefix + variable + func;
     }

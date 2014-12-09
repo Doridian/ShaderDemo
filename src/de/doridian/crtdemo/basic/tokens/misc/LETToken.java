@@ -1,14 +1,16 @@
 package de.doridian.crtdemo.basic.tokens.misc;
 
+import de.doridian.crtdemo.basic.parameters.AbstractParameter;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
 @AbstractToken.TokenName("LET")
 public class LETToken extends AbstractToken {
     @Override
     public void insert() {
-        if(!parametersSplitDetailed[1].valueEquals("="))
+        AbstractParameter[] parameters = parametersSplitDetailed[0].subParams;
+        if(!parameters[1].valueEquals("="))
             throw new SyntaxException();
-        program.addVariable((String)parametersSplitDetailed[0].getValue());
+        program.addVariable((String)parameters[0].getValue());
         super.insert();
     }
 

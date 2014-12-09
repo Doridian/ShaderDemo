@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 
 public abstract class AbstractToken {
     public int line;
-    protected AbstractParameter[] parametersSplitDetailed;
+    protected GroupedParameter[] parametersSplitDetailed;
     protected String parametersRaw;
     protected BasicProgram program;
     private String name;
@@ -90,7 +90,11 @@ public abstract class AbstractToken {
         }
     }
 
-    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE) public @interface TokenName { String[] value(); boolean ignoreParameters() default false; };
+    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE) public @interface TokenName {
+        String[] value();
+        boolean ignoreParameters() default false;
+        boolean noGroups() default false;
+    }
 
     public static class CompilerException extends RuntimeException {
         public CompilerException(String message) {
@@ -168,11 +172,11 @@ public abstract class AbstractToken {
         return token;
     }
 
-    public static AbstractParameter[] parseParameters(String parameters) {
-        ArrayList<AbstractParameter> parsedParameters = new ArrayList<>();
+    public static GroupedParameter[] parseParameters(String parameters, boolean noGroups) {
+        ArrayList<AbstractParameter> parsedParametersCurrentGroup = new ArrayList<>();
+        ArrayList<GroupedParameter> parsedParameters = new ArrayList<>();
 
         boolean inQuotes = false, inBackslash = false, isNumeric = true; int openBrackets = 0;
-        StringBuilder preChars = new StringBuilder();
         StringBuilder preBracket = new StringBuilder();
         StringBuilder tmpStr = new StringBuilder();
         for (int pos = 0; pos < parameters.length(); pos++) {
@@ -188,9 +192,8 @@ public abstract class AbstractToken {
                 } else if (c == '"') {
                     inQuotes = false;
                     isNumeric = true;
-                    parsedParameters.add(new StringLiteralParameter(preChars.toString(), tmpStr.toString()));
+                    parsedParametersCurrentGroup.add(new StringLiteralParameter(tmpStr.toString()));
                     tmpStr.setLength(0);
-                    preChars.setLength(0);
                 } else {
                     tmpStr.append(c);
                 }
@@ -203,8 +206,7 @@ public abstract class AbstractToken {
                     isNumeric = false;
                 } else if(c == ')') {
                     if(--openBrackets == 0) {
-                        parsedParameters.add(new BracketedParameter(preChars.toString(), preBracket.toString(), tmpStr.toString()));
-                        preChars.setLength(0);
+                        parsedParametersCurrentGroup.add(new BracketedParameter(preBracket.toString(), tmpStr.toString()));
                         tmpStr.setLength(0);
                         preBracket.setLength(0);
                         isNumeric = true;
@@ -213,18 +215,21 @@ public abstract class AbstractToken {
                     if (tmpStr.length() > 0)
                         throw new SyntaxException("MISSING COMMA IN PARAMETER STRING: " + parameters);
                     inQuotes = true;
-                } else if ((c == ',' || c == ' ') && openBrackets == 0) {
+                } else if ((c == ' ' || (c == ',' && !noGroups)) && openBrackets == 0) {
                     if (tmpStr.length() >= 1) {
                         if (isNumeric)
-                            parsedParameters.add(new NumberParameter(preChars.toString(), Integer.parseInt(tmpStr.toString())));
+                            parsedParametersCurrentGroup.add(new NumberParameter(Integer.parseInt(tmpStr.toString())));
                         else
-                            parsedParameters.add(new RawStringParameter(preChars.toString(), tmpStr.toString()));
+                            parsedParametersCurrentGroup.add(new RawStringParameter(tmpStr.toString()));
 
                         isNumeric = true;
                         tmpStr.setLength(0);
-                        preChars.setLength(0);
                     }
-                    preChars.append(c);
+
+                    if(c == ',') {
+                        parsedParameters.add(new GroupedParameter(parsedParametersCurrentGroup.toArray(new AbstractParameter[parsedParametersCurrentGroup.size()])));
+                        parsedParametersCurrentGroup.clear();
+                    }
                 } else {
                     tmpStr.append(c);
                     if ((c < '0' || c > '9') && c != '-')
@@ -238,26 +243,33 @@ public abstract class AbstractToken {
 
         if(tmpStr.length() > 0) {
             if (isNumeric)
-                parsedParameters.add(new NumberParameter(preChars.toString(), Integer.parseInt(tmpStr.toString())));
+                parsedParametersCurrentGroup.add(new NumberParameter(Integer.parseInt(tmpStr.toString())));
             else
-                parsedParameters.add(new RawStringParameter(preChars.toString(), tmpStr.toString()));
+                parsedParametersCurrentGroup.add(new RawStringParameter(tmpStr.toString()));
+        }
+
+        if(parsedParametersCurrentGroup.size() > 0) {
+            parsedParameters.add(new GroupedParameter(parsedParametersCurrentGroup.toArray(new AbstractParameter[parsedParametersCurrentGroup.size()])));
+            parsedParametersCurrentGroup.clear();
         }
 
         for(AbstractParameter parameter : parsedParameters)
             validateParameter(parameter);
 
-        return parsedParameters.toArray(new AbstractParameter[parsedParameters.size()]);
+        return parsedParameters.toArray(new GroupedParameter[parsedParameters.size()]);
     }
 
     protected void setData(BasicProgram program, int line, String parameters) {
         this.program = program;
         this.line = line;
 
-        if(this.getClass().getAnnotation(TokenName.class).ignoreParameters()) {
-            this.parametersSplitDetailed = new AbstractParameter[0];
+        TokenName tokenName = this.getClass().getAnnotation(TokenName.class);
+
+        if(tokenName.ignoreParameters()) {
+            this.parametersSplitDetailed = new GroupedParameter[0];
             this.parametersRaw = "";
         } else {
-            this.parametersSplitDetailed = parseParameters(parameters);
+            this.parametersSplitDetailed = parseParameters(parameters, tokenName.noGroups());
             this.parametersRaw = parameters;
         }
     }
@@ -313,10 +325,10 @@ public abstract class AbstractToken {
                                 ret.append('!');
                             case "==":
                                 compareToParam = fixConditionalParameter(parametersSplitDetailed[i + 2]);
-                                ret.append(parameter.preChars);
+                                if(i > start)
+                                    ret.append(parameter.getSeparator());
                                 ret.append(parameter);
                                 ret.append(".equals(");
-                                ret.append(compareToParam.preChars.charAt(0) == ' ' ? compareToParam.preChars.substring(1) : compareToParam.preChars);
                                 ret.append(compareToParam);
                                 ret.append(")");
                                 i += 2;
@@ -325,7 +337,8 @@ public abstract class AbstractToken {
                     }
                 }
             }
-            ret.append(parameter.preChars);
+            if(i > start)
+                ret.append(parameter.getSeparator());
             ret.append(parameter);
         }
         if(negate)
@@ -345,7 +358,8 @@ public abstract class AbstractToken {
         StringBuilder ret = new StringBuilder();
         for(int i = start; i < end; i++) {
             AbstractParameter parameter = fixAssignmentParamater(parametersSplitDetailed[i]);
-            ret.append(parameter.preChars);
+            if(i > start)
+                ret.append(parameter.getSeparator());
             ret.append(parameter);
         }
         return ret.toString();
@@ -388,7 +402,7 @@ public abstract class AbstractToken {
                 break;
         }
 
-        return new RawStringParameter(parameter.preChars, param);
+        return new RawStringParameter(param);
     }
 
     public static AbstractParameter fixConditionalParameter(AbstractParameter parameter) {
@@ -414,6 +428,6 @@ public abstract class AbstractToken {
                 break;
         }
 
-        return new RawStringParameter(parameter.preChars, param);
+        return new RawStringParameter(param);
     }
 }

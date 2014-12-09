@@ -2,7 +2,7 @@ package de.doridian.crtdemo.basic.tokens.misc;
 
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName("END")
+@AbstractToken.TokenName(value = "END", ignoreParameters = true)
 public class ENDToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {

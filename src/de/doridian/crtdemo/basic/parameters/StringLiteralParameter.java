@@ -3,8 +3,8 @@ package de.doridian.crtdemo.basic.parameters;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class StringLiteralParameter extends AbstractParameter {
-    public StringLiteralParameter(String preChars, String parameter) {
-        super(preChars, StringEscapeUtils.unescapeJava(parameter));
+    public StringLiteralParameter(String parameter) {
+        super(StringEscapeUtils.unescapeJava(parameter));
     }
 
     @Override

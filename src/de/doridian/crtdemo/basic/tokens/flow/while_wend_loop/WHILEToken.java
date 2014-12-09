@@ -2,7 +2,7 @@ package de.doridian.crtdemo.basic.tokens.flow.while_wend_loop;
 
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName("WHILE")
+@AbstractToken.TokenName(value = "WHILE", noGroups = true)
 public class WHILEToken extends AbstractToken {
     @Override
     public void insert() {

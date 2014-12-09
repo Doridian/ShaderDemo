@@ -2,7 +2,7 @@ package de.doridian.crtdemo.basic.tokens.flow.do_loop_loop;
 
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName("LOOP")
+@AbstractToken.TokenName(value = "LOOP", noGroups = true)
 public class LOOPToken extends AbstractToken {
     @Override
     public void insert() {

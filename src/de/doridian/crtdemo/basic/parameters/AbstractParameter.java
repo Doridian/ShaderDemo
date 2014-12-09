@@ -2,11 +2,9 @@ package de.doridian.crtdemo.basic.parameters;
 
 public abstract class AbstractParameter {
     protected final Object value;
-    public final String preChars;
 
-    public AbstractParameter(String preChars, Object parameter) {
+    public AbstractParameter(Object parameter) {
         value = parameter;
-        this.preChars = preChars;
     }
 
     public Object getValue() {
@@ -23,6 +21,10 @@ public abstract class AbstractParameter {
 
     public String getAsParameter() {
         return getStringValue();
+    }
+
+    public String getSeparator() {
+        return " ";
     }
 
     @Override

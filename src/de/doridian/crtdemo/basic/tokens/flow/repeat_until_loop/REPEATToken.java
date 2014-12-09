@@ -2,7 +2,7 @@ package de.doridian.crtdemo.basic.tokens.flow.repeat_until_loop;
 
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName("REPEAT")
+@AbstractToken.TokenName(value = "REPEAT", noGroups = true)
 public class REPEATToken extends AbstractToken {
     @Override
     public void insert() {

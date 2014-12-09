@@ -1,8 +1,9 @@
 package de.doridian.crtdemo.basic.tokens.flow.for_next_loop;
 
+import de.doridian.crtdemo.basic.parameters.AbstractParameter;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName("FOR")
+@AbstractToken.TokenName(value = "FOR", noGroups = true)
 public class FORToken extends AbstractToken {
     @Override
     public void insert() {
@@ -11,16 +12,18 @@ public class FORToken extends AbstractToken {
         int to = 0;
         int step = 1;
 
-        if(!parametersSplitDetailed[1].valueEquals("=") || !parametersSplitDetailed[3].valueEquals("TO"))
+        AbstractParameter[] parameters = parametersSplitDetailed[0].subParams;
+
+        if(!parameters[1].valueEquals("=") || !parameters[3].valueEquals("TO"))
             throw new SyntaxException();
 
-        variableName = (String)parametersSplitDetailed[0].getValue();
-        from = (Integer)parametersSplitDetailed[2].getValue();
-        to = (Integer)parametersSplitDetailed[4].getValue();
-        if(parametersSplitDetailed.length > 5) {
-            if(!parametersSplitDetailed[5].valueEquals("STEP"))
+        variableName = (String)parameters[0].getValue();
+        from = (Integer)parameters[2].getValue();
+        to = (Integer)parameters[4].getValue();
+        if(parameters.length > 5) {
+            if(!parameters[5].valueEquals("STEP"))
                 throw new SyntaxException();
-            step = (Integer)parametersSplitDetailed[6].getValue();
+            step = (Integer)parameters[6].getValue();
         }
 
         if(step == 0)

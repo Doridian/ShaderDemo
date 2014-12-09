@@ -2,7 +2,7 @@ package de.doridian.crtdemo.basic.tokens.flow.gosub_return;
 
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName("RETURN")
+@AbstractToken.TokenName(value = "RETURN", ignoreParameters = true)
 public class RETURNToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {

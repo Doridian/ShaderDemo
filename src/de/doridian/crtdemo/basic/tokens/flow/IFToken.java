@@ -3,7 +3,7 @@ package de.doridian.crtdemo.basic.tokens.flow;
 import de.doridian.crtdemo.basic.parameters.AbstractParameter;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
-@AbstractToken.TokenName("IF")
+@AbstractToken.TokenName(value = "IF", noGroups = true)
 public class IFToken extends AbstractToken {
     @Override
     public void insert() {
@@ -13,19 +13,21 @@ public class IFToken extends AbstractToken {
         int stage = 0;
         int prevStage = 0;
 
-        for(int i = 0; i < parametersSplitDetailed.length; i++) {
-            AbstractParameter parameter = parametersSplitDetailed[i];
+        AbstractParameter[] parameters = parametersSplitDetailed[0].subParams;
+
+        for(int i = 0; i < parameters.length; i++) {
+            AbstractParameter parameter = parameters[i];
             switch (stage) {
                 case 0:
                     if (parameter.valueEquals("THEN")) {
                         stage = 1;
-                        conditionExpression = getAsConditionalParameters(prevStage, i, false);
+                        conditionExpression = getAsConditionalParameters(parameters, prevStage, i, false);
                         prevStage = i + 1;
                     }
                     break;
                 case 1:
                     if(parameter.valueEquals("ELSE")) {
-                        ifExpression = getAsAssignmentParameters(prevStage, i);
+                        ifExpression = getAsAssignmentParameters(parameters, prevStage, i);
                         prevStage = i + 1;
                         i = parametersSplitDetailed.length;
                         stage = 2;
@@ -38,10 +40,10 @@ public class IFToken extends AbstractToken {
             case 0:
                 throw new SyntaxException("INVALID IF CONSTRUCT");
             case 1:
-                ifExpression = getAsAssignmentParameters(prevStage, parametersSplitDetailed.length);
+                ifExpression = getAsAssignmentParameters(parameters, prevStage, parameters.length);
                 break;
             case 2:
-                elseExpression = getAsAssignmentParameters(prevStage, parametersSplitDetailed.length);
+                elseExpression = getAsAssignmentParameters(parameters, prevStage, parameters.length);
                 break;
         }
 
