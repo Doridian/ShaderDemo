@@ -205,6 +205,8 @@ public abstract class AbstractToken {
                     }
                     isNumeric = false;
                 } else if(c == ')') {
+                    if(openBrackets <= 0)
+                        throw new SyntaxException("CANNOT CLOSE NON-OPEN BRACKET");
                     if(--openBrackets == 0) {
                         parsedParametersCurrentGroup.add(new BracketedParameter(preBracket.toString(), tmpStr.toString()));
                         tmpStr.setLength(0);
@@ -213,7 +215,7 @@ public abstract class AbstractToken {
                     }
                 } else if (c == '"' && openBrackets == 0) {
                     if (tmpStr.length() > 0)
-                        throw new SyntaxException("MISSING COMMA IN PARAMETER STRING: " + parameters);
+                        throw new SyntaxException("MISSING COMMA IN PARAMETER STRING");
                     inQuotes = true;
                 } else if ((c == ' ' || (c == ',' && !noGroups)) && openBrackets == 0) {
                     if (tmpStr.length() >= 1) {
@@ -239,7 +241,7 @@ public abstract class AbstractToken {
         }
 
         if (inQuotes || inBackslash || openBrackets > 0)
-            throw new SyntaxException("IN PARAMETER STRING: " + parameters);
+            throw new SyntaxException("IN PARAMETER STRING");
 
         if(tmpStr.length() > 0) {
             if (isNumeric)
