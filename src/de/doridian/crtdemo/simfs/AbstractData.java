@@ -46,7 +46,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
             return fileSystem.getCluster(cluster).read();
     }
 
-    protected void setLength(int len) {
+    public void setLength(int len) {
         //TODO
     }
 
