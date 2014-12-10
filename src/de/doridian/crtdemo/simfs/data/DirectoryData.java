@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class DirectoryData extends AbstractData implements IDirectoryData {
     public DirectoryData(FileSystem fileSystem) {
         super(fileSystem);
+        directAutoFlush = false;
     }
 
     @Override
