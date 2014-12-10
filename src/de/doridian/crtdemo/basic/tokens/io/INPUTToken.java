@@ -11,9 +11,9 @@ public class INPUTToken extends AbstractToken {
         String variable = parametersSplitDetailed[parametersSplitDetailed.length - 1].subParams[0].getAsParameter();
         program.addVariable(variable);
 
-        String func = " = $io.getLine();";
+        String func = " = $io.readLine();";
         if(variable.charAt(variable.length() - 1) != '$')
-            func = " = Integer.parseInt($io.getLine());";
+            func = " = Integer.parseInt($io.readLine());";
 
         if(parametersSplitDetailed.length > 1)
             for(int i = 0; i < parametersSplitDetailed.length - 1; i++)

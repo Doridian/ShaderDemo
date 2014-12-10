@@ -74,12 +74,32 @@ public class CodeParser {
 
         compiledProgram.$start(new BasicIO() {
             @Override
-            public String getLine() {
+            public String readLine() {
                 try {
                     return inputReader.readLine().trim();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+            @Override
+            public void clearLine(int line) {
+
+            }
+
+            @Override
+            public void clearScreen() {
+
+            }
+
+            @Override
+            public int getLines() {
+                return 9999;
+            }
+
+            @Override
+            public int getColumns() {
+                return 256;
             }
 
             @Override

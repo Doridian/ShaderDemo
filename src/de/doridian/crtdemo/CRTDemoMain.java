@@ -109,7 +109,7 @@ public class CRTDemoMain extends OpenGLMain {
 
 	public static class CRTBasicIO implements BasicIO {
 		@Override
-		public String getLine() {
+		public String readLine() {
 			promptInputAllowed++;
 			try {
 				return inputQueue.take();
@@ -140,17 +140,40 @@ public class CRTDemoMain extends OpenGLMain {
 			posY = y % 16;
 			refreshCursor();
 		}
+
+		@Override
+		public void clearLine(int line) {
+			blankLine(line);
+		}
+
+		@Override
+		public void clearScreen() {
+			blankScreen();
+		}
+
+		@Override
+		public int getLines() {
+			return 16;
+		}
+
+		@Override
+		public int getColumns() {
+			return 32;
+		}
 	}
 
 	private static MainShader makeShader(String resource) {
 		return new MainShader(ShaderProgram.VSH_DONOTHING, null, Util.readStreamFully(CRTDemoMain.class.getResourceAsStream("/" + resource + ".fsh")));
 	}
 
-	public static void main(String[] args) throws Exception {
+	private static void blankScreen() {
 		for(int i = 0; i < 16; i++)
 			blankLine(i);
-
 		refreshCursor();
+	}
+
+	public static void main(String[] args) throws Exception {
+		blankScreen();
 
 		final int THREAD_SLEEP_DIVIDER = 1;
 
@@ -176,7 +199,7 @@ public class CRTDemoMain extends OpenGLMain {
 				final BasicIO io = new CRTBasicIO();
 
 				io.print("foxBIOS v0.1b\nHit return to boot ");
-				io.getLine();
+				io.readLine();
 				io.print("Booting...\n");
 
 				doSleep(500);
