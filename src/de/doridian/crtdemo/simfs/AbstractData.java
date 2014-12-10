@@ -77,7 +77,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
         int writtenData = 0;
 
         int oldPos = startCluster * getClusterDataSize();
-        byte[] oldData = new byte[((int)Math.ceil(((double) (len + (pos - oldPos))) / ((double) getClusterDataSize()))) * getClusterDataSize()];
+        byte[] oldData = new byte[((int)Math.ceil(((double) (len + (filePos - oldPos))) / ((double) getClusterDataSize()))) * getClusterDataSize()];
         int oldLen = readAbsolute(oldPos, oldData, 0, oldData.length);
 
         for(int cluster = startCluster; cluster <= endCluster; cluster++) {
@@ -87,7 +87,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
 
             byte[] clusterData = new byte[Math.max(curLen + curOffset, curOldLen)];
 
-            System.arraycopy(oldData, oldPos + writtenData, clusterData, 0, curOldLen);
+            System.arraycopy(oldData, writtenData, clusterData, 0, curOldLen);
             System.arraycopy(data, pos + writtenData, clusterData, curOffset, curLen);
 
             writtenData += curLen;
@@ -105,8 +105,10 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
     protected int readAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
         int startCluster = getClusterFor(filePos);
         int endCluster = getClusterFor(filePos + len);
-        if(endCluster > lastClusterIndex)
+        if(lastClusterIndex >= 0 && endCluster > lastClusterIndex)
             endCluster = lastClusterIndex;
+        if(endCluster < startCluster)
+            return 0;
 
         int readLen = 0;
         Cluster currentCluster = attributeCluster;
@@ -118,6 +120,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
                     currentCluster = null;
                 else
                     currentCluster = fileSystem.getCluster(currentCluster.nextCluster);
+
                 if(cluster < startCluster)
                     continue;
             }

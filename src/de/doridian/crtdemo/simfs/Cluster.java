@@ -58,7 +58,10 @@ public class Cluster {
     }
 
     public void write(byte[] contents) throws IOException {
+        if(contents.length > fileSystem.clusterSize - HEADER_SIZE)
+            throw new IOException("Too big");
         writeHead();
+
         fileSystem.randomAccessFile.writeByte(contents.length);
         fileSystem.randomAccessFile.write(contents, 0, contents.length);
     }

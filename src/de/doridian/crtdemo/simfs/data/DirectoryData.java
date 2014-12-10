@@ -108,7 +108,7 @@ public class DirectoryData extends AbstractData {
 
     @Override
     public void flush() throws IOException {
-        if(attributeCluster != null)
+        if((!dataClustersDirty.isEmpty()) && attributeCluster != null)
             compact();
 
         super.flush();

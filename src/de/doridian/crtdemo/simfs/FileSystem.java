@@ -105,6 +105,7 @@ public class FileSystem {
             data = new FileData(this);
         data.name = new String(firstCluster.read(), "ASCII");
 
+        data.lastClusterIndex = -1;
         data.attributeCluster = firstCluster;
 
         return data;
@@ -158,6 +159,7 @@ public class FileSystem {
                         break;
 
                     Cluster newCluster = allocateCluster(false);
+
                     currentCluster.readHead();
                     currentCluster.nextCluster = newCluster.location;
                     currentCluster.writeHead();
