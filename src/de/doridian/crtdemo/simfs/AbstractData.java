@@ -120,10 +120,10 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
                     currentCluster = null;
                 else
                     currentCluster = fileSystem.getCluster(currentCluster.nextCluster);
-
-                if(cluster < startCluster)
-                    continue;
             }
+
+            if(cluster < startCluster)
+                continue;
 
             byte[] dataRead;
 
