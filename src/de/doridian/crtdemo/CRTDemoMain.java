@@ -221,6 +221,7 @@ public class CRTDemoMain extends OpenGLMain {
 
 				io.print("foxBIOS v0.1b\nCore booting");
 				printLoad('.', 3, 3000, " OK\n");
+
 				io.print("Initializing disk bus");
 				printLoad('.', 3, 2000, " OK\n");
 
