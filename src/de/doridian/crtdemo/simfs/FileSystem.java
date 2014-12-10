@@ -1,10 +1,12 @@
 package de.doridian.crtdemo.simfs;
 
+import com.google.common.collect.MapMaker;
 import de.doridian.crtdemo.simfs.data.DirectoryData;
 import de.doridian.crtdemo.simfs.data.FileData;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.concurrent.ConcurrentMap;
 
 public class FileSystem {
     public static int HEADER_SIZE = 1 + 2;
@@ -15,6 +17,8 @@ public class FileSystem {
     final RandomAccessFile randomAccessFile;
 
     public final DirectoryData rootDirectory;
+
+    private final ConcurrentMap<Integer, Cluster> clusterWeakHashMap = new MapMaker().weakValues().makeMap();
 
     private FileSystem(int clusterSize, int numClusters, RandomAccessFile file, boolean rootDirectoryExists) throws IOException {
         this.clusterSize = clusterSize;
@@ -58,7 +62,13 @@ public class FileSystem {
         if(clusterNumber < 0)
             return null;
 
-        return new Cluster(clusterNumber, this);
+        if(clusterWeakHashMap.containsKey(clusterNumber))
+            return clusterWeakHashMap.get(clusterNumber);
+
+
+        Cluster ret = new Cluster(clusterNumber, this);
+        clusterWeakHashMap.put(clusterNumber, ret);
+        return ret;
     }
 
     Cluster allocateCluster(boolean clean) throws IOException {

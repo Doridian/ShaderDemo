@@ -23,7 +23,7 @@ public class FileSystemTest {
 
         file = new RandomAccessFile("test.fs", "rw");
         if(reset)
-            fs = FileSystem.create(128, 32000, file);
+            fs = FileSystem.create(512, 32000, file);
         else
             fs = FileSystem.read(file);
     }
