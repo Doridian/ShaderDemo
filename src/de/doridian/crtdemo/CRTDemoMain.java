@@ -223,7 +223,7 @@ public class CRTDemoMain extends OpenGLMain {
 				printLoad('.', 3, 3000, " OK\n");
 
 				io.print("Initializing disk bus");
-				printLoad('.', 3, 2000, " OK\n");
+				printLoad('.', 3, 2000, " ");
 
 				final DriveGroup driveGroup;
 				try {
@@ -236,6 +236,8 @@ public class CRTDemoMain extends OpenGLMain {
 					halt();
 					return;
 				}
+
+				io.print("OK\n");
 
 				final TreeMap<Character, IFileSystem> drives = driveGroup.getDrives();
 
