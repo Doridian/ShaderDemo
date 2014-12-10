@@ -14,10 +14,14 @@ public class FileSystemTest {
 
     public static void main(String[] args) throws Exception {
         loadFS(true);
-        doTest();
+        doTest(true);
 
         loadFS(false);
-        doTest();
+        doTest(false);
+        
+        System.out.println("================");
+        System.out.println("ALL TESTS PASSED");
+        System.out.println("================");
     }
 
     public static void loadFS(boolean reset) throws IOException {
@@ -32,15 +36,18 @@ public class FileSystemTest {
         rootDirectory = fs.getRootDirectory();
     }
 
-    private static void doTest() throws Exception {
-        deepFileTest();
-        longFileTest();
+    private static void doTest(boolean mayCreate) throws Exception {
+        deepFileTest(mayCreate);
+        longFileTest(mayCreate);
         //rootDirectory.flush();
     }
 
-    public static void longFileTest() throws Exception {
+    public static void longFileTest(boolean mayCreate) throws Exception {
         IFileData mainTxt = (IFileData)rootDirectory.findFile("test.bin");
         if(mainTxt == null) {
+            if(!mayCreate)
+                throw new Exception("INVALID0");
+
             mainTxt = rootDirectory.createFile("test.bin");
 
             mainTxt.seek(0);
@@ -61,29 +68,33 @@ public class FileSystemTest {
         }
     }
 
-    public static void deepFileTest() throws Exception {
+    public static void deepFileTest(boolean mayCreate) throws Exception {
         IDirectoryData directory = rootDirectory;
         for(int i = 0; i < 10; i++) {
             IDirectoryData subDirectory = (IDirectoryData)directory.findFile("d" + i);
             if(subDirectory == null) {
+                if(!mayCreate)
+                    throw new Exception("INVALID0");
                 subDirectory = directory.createDirectory("d" + i);
                 System.out.println("D CREATE " + i);
             } else {
                 System.out.println("D FOUND " + i);
             }
 
-            basicFileTest(subDirectory);
+            basicFileTest(subDirectory, mayCreate);
 
             directory = subDirectory;
         }
     }
 
-    public static void basicFileTest(IDirectoryData directoryData) throws Exception {
+    public static void basicFileTest(IDirectoryData directoryData, boolean mayCreate) throws Exception {
         //System.out.println(directoryData.listFiles().length);
         for(int i = 0; i < 10; i++) {
             IFileData mainTxt = (IFileData)directoryData.findFile("main_" + i + ".txt");
 
             if (mainTxt == null) {
+                if(!mayCreate)
+                    throw new Exception("INVALID0");
                 mainTxt = directoryData.createFile("main_" + i + ".txt");
                 //mainTxt.flush();
 
