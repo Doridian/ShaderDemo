@@ -32,6 +32,14 @@ public abstract class BaseCompiledProgram {
         }
     }
 
+    public int SCREENWIDTH() {
+        return $io.getColumns();
+    }
+
+    public int SCREENHEIGHT() {
+        return $io.getLines();
+    }
+
     protected ConcurrentLinkedQueue<Integer> $callQueue = null;
     protected ConcurrentLinkedQueue<LoopLines> $loopQueue = null;
 

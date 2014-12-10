@@ -14,9 +14,7 @@ import de.doridian.crtdemo.basic.tokens.flow.repeat_until_loop.REPEATToken;
 import de.doridian.crtdemo.basic.tokens.flow.repeat_until_loop.UNTILToken;
 import de.doridian.crtdemo.basic.tokens.flow.while_wend_loop.WENDToken;
 import de.doridian.crtdemo.basic.tokens.flow.while_wend_loop.WHILEToken;
-import de.doridian.crtdemo.basic.tokens.io.ATToken;
-import de.doridian.crtdemo.basic.tokens.io.INPUTToken;
-import de.doridian.crtdemo.basic.tokens.io.PRINTToken;
+import de.doridian.crtdemo.basic.tokens.io.*;
 import de.doridian.crtdemo.basic.tokens.misc.ENDToken;
 import de.doridian.crtdemo.basic.tokens.misc.LETToken;
 import de.doridian.crtdemo.basic.tokens.misc.NOOPToken;
@@ -51,6 +49,8 @@ public abstract class AbstractToken {
         addToken(INPUTToken.class);
         addToken(PRINTToken.class);
         addToken(ATToken.class);
+        addToken(CLLToken.class);
+        addToken(CLSToken.class);
 
         // Flow control
         addToken(GOSUBToken.class);
