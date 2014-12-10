@@ -43,6 +43,16 @@ public class FileSystem implements IFileSystem {
         this.rootDirectory = rootDirectory;
     }
 
+    @Override
+    public int getClusterSize() {
+        return clusterSize;
+    }
+
+    @Override
+    public int getClusterCount() {
+        return numClusters;
+    }
+
     public IDirectoryData getRootDirectory() {
         return rootDirectory;
     }

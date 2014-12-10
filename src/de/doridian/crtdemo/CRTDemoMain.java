@@ -7,11 +7,16 @@ import de.doridian.crtdemo.basic.CodeParser;
 import de.doridian.crtdemo.shader.MainShader;
 import de.doridian.crtdemo.shader.OpenGLMain;
 import de.doridian.crtdemo.shader.ShaderProgram;
+import de.doridian.crtdemo.simfs.FileSystem;
+import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.rmi.server.ExportException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CRTDemoMain extends OpenGLMain {
@@ -65,7 +70,7 @@ public class CRTDemoMain extends OpenGLMain {
 	}
 
 	public static void nextLine() {
-		posX = 32;
+		posX = 31;
 		moveForward();
 	}
 
@@ -145,11 +150,34 @@ public class CRTDemoMain extends OpenGLMain {
 
 		refreshCursor();
 
-		CodeParser parser = new CodeParser(Util.readFile("data/test.basic"), true);
-		final BaseCompiledProgram program = parser.compile();
 		Thread basicThread = new Thread() {
+			private void doSleep(int millis) {
+				try { Thread.sleep(millis); } catch (InterruptedException e) { }
+			}
+
 			public void run() {
-				BasicIO io = new CRTBasicIO();
+				final BasicIO io = new CRTBasicIO();
+
+				io.print("Loading FileSystem... ");
+
+				final IFileSystem fileSystem;
+				doSleep(500);
+				try {
+					fileSystem = FileSystem.read(new RandomAccessFile("data/filesystem", "rw"));
+				} catch (IOException e) {
+					e.printStackTrace();
+					io.print("ERROR\n");
+					System.exit(0);
+					return;
+				}
+
+				io.print("OK\nC:\\ " + fileSystem.getClusterCount() + "C, " + fileSystem.getClusterSize() + "BPC\n");
+
+				doSleep(2000);
+
+				CodeParser parser = new CodeParser(Util.readFile("data/test.basic"), true);
+				final BaseCompiledProgram program = parser.compile();
+
 				program.$start(io);
 			}
 		};
