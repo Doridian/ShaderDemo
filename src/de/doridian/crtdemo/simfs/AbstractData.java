@@ -1,18 +1,26 @@
 package de.doridian.crtdemo.simfs;
 
+import org.lwjgl.Sys;
+
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.TreeMap;
 
 public class AbstractData extends SimpleDataInputOutput implements Closeable {
     public Cluster attributeCluster;
-    protected FileSystem fileSystem;
+    protected final FileSystem fileSystem;
     String name;
 
     protected TreeMap<Integer, byte[]> dataClustersDirty = new TreeMap<>();
     protected boolean attributesDirty;
 
     private int currentPos = 0;
+
+    public AbstractData(FileSystem fileSystem) {
+        this.fileSystem = fileSystem;
+    }
 
     protected int getSetAttributes() {
         return 0;
@@ -35,14 +43,32 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
         return fileSystem.clusterSize - Cluster.HEADER_SIZE;
     }
 
+    private byte[] readCluster(int cluster) throws IOException {
+        if(dataClustersDirty.containsKey(cluster))
+            return dataClustersDirty.get(cluster);
+        else
+            return fileSystem.getCluster(cluster).read();
+    }
+
     protected void writeAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
         int startCluster = getClusterFor(filePos);
         int endCluster = getClusterFor(filePos + len - 1);
         int writtenData = 0;
+
+        int oldPos = startCluster * getClusterDataSize();
+        byte[] oldData = new byte[(int)Math.ceil(((double)(len + (pos - oldPos))) / ((double)getClusterDataSize()))];
+        int oldLen = readAbsolute(oldPos, oldData, 0, oldData.length);
+
         for(int cluster = startCluster; cluster <= endCluster; cluster++) {
             int curLen = Math.min(getClusterDataSize(), len - writtenData);
-            byte[] clusterData = new byte[curLen];
-            System.arraycopy(data, pos + writtenData, clusterData, 0, curLen);
+            int curOldLen = Math.min(getClusterDataSize(), oldLen - writtenData);
+            int curOffset = (cluster == startCluster) ? filePos % getClusterDataSize() : 0;
+
+            byte[] clusterData = new byte[Math.max(curLen + curOffset, curOldLen)];
+
+            System.arraycopy(oldData, oldPos + writtenData, clusterData, 0, curOldLen);
+            System.arraycopy(data, pos + writtenData, clusterData, curOffset, curLen);
+
             writtenData += curLen;
             dataClustersDirty.put(cluster, clusterData);
         }
@@ -63,16 +89,20 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
             if(cluster < startCluster)
                 continue;
             byte[] dataRead;
-            if(dataClustersDirty.containsKey(cluster))
-                dataRead = dataClustersDirty.get(cluster);
-            else
-                dataRead = currentCluster.read();
-            System.arraycopy(dataRead, 0, data, pos + readLen, Math.min(dataRead.length, len - readLen));
+
+            int cOffset = (cluster == startCluster) ? filePos % getClusterDataSize() : 0;
+            int cMaxLen = len - readLen;
+
+            if(dataClustersDirty.containsKey(cluster)) {
+                byte[] dirtyCluster = dataClustersDirty.get(cluster);
+                dataRead = new byte[Math.min(dirtyCluster.length, cMaxLen)];
+                System.arraycopy(dirtyCluster, cOffset, dataRead, 0, dataRead.length);
+            } else
+                dataRead = currentCluster.read(cOffset, cMaxLen);
+            System.arraycopy(dataRead, 0, data, pos + readLen, dataRead.length);
             readLen += dataRead.length;
         }
 
-        if(readLen > len)
-            return len;
         return readLen;
     }
 
@@ -82,12 +112,15 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
 
     @Override
     protected int readBytes(byte[] b, int off, int len) throws IOException {
-        return readAbsolute(currentPos, b, off, len);
+        int read = readAbsolute(currentPos, b, off, len);
+        currentPos += read;
+        return read;
     }
 
     @Override
     protected void writeBytes(byte[] b, int off, int len) throws IOException {
         writeAbsolute(currentPos, b, off, len);
+        currentPos += len;
     }
 
     @Override

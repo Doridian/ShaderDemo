@@ -20,25 +20,23 @@ public class FileSystem {
         this.clusterSize = clusterSize;
         this.numClusters = numClusters;
         this.randomAccessFile = file;
+        file.setLength(HEADER_SIZE + (this.clusterSize * this.numClusters));
+        file.seek(0);
 
         DirectoryData rootDirectory;
-        if(rootDirectoryExists) {
+        try {
             rootDirectory = (DirectoryData)readData(0);
-        } else {
-            rootDirectory = new DirectoryData();
-            deleteData(rootDirectory);
-
-            rootDirectory.attributesDirty = true;
-            rootDirectory.attributeCluster = getCluster(0);
+        } catch (NotValidDataException e) {
+            rootDirectory = new DirectoryData(this);
             rootDirectory.setName("ROOT");
-
-            writeData(rootDirectory);
+            rootDirectory.flush();
         }
+
         this.rootDirectory = rootDirectory;
     }
 
     public static FileSystem create(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
-        file.setLength(clusterSize * numClusters);
+        file.setLength(HEADER_SIZE);
         file.seek(0);
         file.writeByte(clusterSize);
         file.writeShort(numClusters);
@@ -46,6 +44,7 @@ public class FileSystem {
     }
 
     public static FileSystem read(RandomAccessFile file) throws IOException {
+        file.seek(0);
         int clusterSize = file.readUnsignedByte();
         int numClusters = file.readUnsignedShort();
         return new FileSystem(clusterSize, numClusters, file, true);
@@ -63,11 +62,13 @@ public class FileSystem {
     }
 
     Cluster allocateCluster() throws IOException {
-        for(int i = 1; i < numClusters; i++) {
+        for(int i = 0; i < numClusters; i++) {
             Cluster cluster = getCluster(i);
             cluster.readAttributes();
             if(!cluster.isAttribute(Cluster.ATTRIBUTE_ALLOCATED)) {
                 cluster.attributes = Cluster.ATTRIBUTE_ALLOCATED;
+                cluster.nextCluster = 0;
+                cluster.writeHead();
                 return cluster;
             }
         }
@@ -84,20 +85,22 @@ public class FileSystem {
         cluster.writeAttributes();
     }
 
+    public static class NotValidDataException extends IOException {
+
+    }
+
     public AbstractData readData(int startCluster) throws IOException {
         Cluster firstCluster = getCluster(startCluster);
-        firstCluster.read();
-        if(!firstCluster.isAttribute(Cluster.ATTRIBUTE_FIRST))
-            throw new IOException("Not a first cluster");
+        firstCluster.readAttributes();
+        if(!firstCluster.isAttribute(Cluster.ATTRIBUTE_FIRST | Cluster.ATTRIBUTE_ALLOCATED))
+            throw new NotValidDataException();
 
         AbstractData data;
         if(firstCluster.isAttribute(Cluster.ATTRIBUTE_DIRECTORY))
-            data = new DirectoryData();
+            data = new DirectoryData(this);
         else
-            data = new FileData();
+            data = new FileData(this);
         data.name = new String(firstCluster.read(), "ASCII");
-
-        data.fileSystem = this;
 
         data.attributeCluster = firstCluster;
 
@@ -105,8 +108,6 @@ public class FileSystem {
     }
 
     public void deleteData(AbstractData data) throws IOException {
-        data.fileSystem = this;
-
         if(data.attributeCluster != null)
             deallocateCluster(data.attributeCluster);
 
@@ -117,14 +118,12 @@ public class FileSystem {
     }
 
     public void writeData(AbstractData data) throws IOException {
-        data.fileSystem = this;
-
         if(data.attributeCluster == null) {
             deleteData(data);
 
             data.attributeCluster = allocateCluster();
             data.attributeCluster.setAttribute(Cluster.ATTRIBUTE_FIRST, true);
-            data.attributeCluster.setAttribute(data.getSetAttributes(), true);;
+            data.attributeCluster.setAttribute(data.getSetAttributes(), true);
         }
 
         if(data.attributesDirty) {
@@ -150,8 +149,10 @@ public class FileSystem {
                     currentCluster.readHead();
                 } else {
                     Cluster newCluster = allocateCluster();
-
+                    currentCluster.readHead();
                     currentCluster.nextCluster = newCluster.location;
+                    currentCluster.writeHead();
+
                     currentCluster = newCluster;
 
                     forceWriteThisCluster = true;

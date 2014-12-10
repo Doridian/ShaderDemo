@@ -2,12 +2,19 @@ package de.doridian.crtdemo.simfs.data;
 
 import de.doridian.crtdemo.simfs.AbstractData;
 import de.doridian.crtdemo.simfs.Cluster;
+import de.doridian.crtdemo.simfs.FileSystem;
+import org.lwjgl.Sys;
 
+import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class DirectoryData extends AbstractData {
+    public DirectoryData(FileSystem fileSystem) {
+        super(fileSystem);
+    }
+
     @Override
     protected int getSetAttributes() {
         return Cluster.ATTRIBUTE_DIRECTORY;
@@ -48,6 +55,8 @@ public class DirectoryData extends AbstractData {
     }
 
     private int getFileLocation(AbstractData file) throws IOException {
+        if(file.attributeCluster == null)
+            file.flush();
         return getClusterLocation(file.attributeCluster.location);
     }
 
@@ -62,6 +71,8 @@ public class DirectoryData extends AbstractData {
     public void addFile(AbstractData file) throws IOException {
         if(getFileLocation(file) >= 0)
             return;
+        if(file.attributeCluster == null)
+            file.flush();
         seek(getFreeLocation());
         writeShort(file.attributeCluster.location);
     }
@@ -72,6 +83,8 @@ public class DirectoryData extends AbstractData {
         try {
             int nextCluster;
             while ((nextCluster = readUnsignedShort()) != -1) {
+                if(nextCluster == 0)
+                    continue;
                 files.add(fileSystem.readData(nextCluster));
             }
         } catch (EOFException e) { }

@@ -1,11 +1,11 @@
 package de.doridian.crtdemo.simfs;
 
 import com.sun.javafx.property.adapter.ReadOnlyJavaBeanPropertyBuilderHelper;
+import org.lwjgl.Sys;
 
 import java.io.*;
 
 public class Cluster {
-    public final static short FILE_NAME_SIZE = 8 + 1 + 3;
     public final static short HEADER_SIZE = 1 + 2;
 
     final FileSystem fileSystem;
@@ -16,38 +16,48 @@ public class Cluster {
 
     private boolean headRead = false, attributesRead = false;
 
-    //First cluster only
-    public String name; //8 bytes + '.' + 3 bytes
-
     public Cluster(int location, FileSystem fileSystem) {
         this.location = location;
         this.fileSystem = fileSystem;
     }
 
     public byte[] read() throws IOException {
-        headRead = false;
-        readHead();
+        return read(0, Integer.MAX_VALUE);
+    }
+
+    public byte[] read(int offset, int maxLen) throws IOException {
+        if(!readHead())
+            fileSystem.randomAccessFile.skipBytes(2);
         int dataSize = fileSystem.randomAccessFile.readUnsignedShort();
+        if(offset > 0)
+            dataSize -= offset;
+        if(dataSize <= 0)
+            return new byte[0];
+        if(dataSize > maxLen)
+            dataSize = maxLen;
         byte[] contents = new byte[dataSize];
+        fileSystem.randomAccessFile.skipBytes(offset);
         fileSystem.randomAccessFile.readFully(contents);
         return contents;
     }
 
-    public void readHead() throws IOException {
+    public boolean readHead() throws IOException {
+        if(!readAttributes())
+            fileSystem.randomAccessFile.skipBytes(1);
         if(headRead)
-            return;
-        attributesRead = false;
-        readAttributes();
+            return false;
         nextCluster = fileSystem.randomAccessFile.readUnsignedShort();
         headRead = true;
+        return true;
     }
 
-    public void readAttributes() throws IOException {
-        if(attributesRead)
-            return;
+    public boolean readAttributes() throws IOException {
         fileSystem.seekToCluster(this);
+        if(attributesRead)
+            return false;
         attributes = fileSystem.randomAccessFile.readUnsignedByte();
         attributesRead = true;
+        return true;
     }
 
     public void write(byte[] contents) throws IOException {
@@ -59,11 +69,13 @@ public class Cluster {
     public void writeAttributes() throws IOException {
         fileSystem.seekToCluster(this);
         fileSystem.randomAccessFile.writeByte(attributes);
+        attributesRead = true;
     }
 
     public void writeHead() throws IOException {
         writeAttributes();
-        fileSystem.randomAccessFile.writeShort(nextCluster);;
+        fileSystem.randomAccessFile.writeShort(nextCluster);
+        headRead = true;
     }
 
     public boolean isAttribute(int attribute) {
@@ -77,8 +89,8 @@ public class Cluster {
             attributes &= ~attribute;
     }
 
-    public static final byte ATTRIBUTE_ALLOCATED = 0x01;
-    public static final byte ATTRIBUTE_FIRST = 0x02;
-    public static final byte ATTRIBUTE_DIRECTORY = 0x04;
-    public static final byte ATTRIBUTE_READONLY = 0x08;
+    public static final byte ATTRIBUTE_ALLOCATED = 1;
+    public static final byte ATTRIBUTE_FIRST = 2;
+    public static final byte ATTRIBUTE_DIRECTORY = 4;
+    public static final byte ATTRIBUTE_READONLY = 8;
 }
