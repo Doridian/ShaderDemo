@@ -65,6 +65,10 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
             System.arraycopy(cluster, 0, endCluster, 0, Math.min(endCluster.length, cluster.length));
         dataClustersDirty.put(lastCluster, endCluster);
         lastClusterIndex = lastCluster;
+
+        Integer higherKey;
+        while((higherKey = dataClustersDirty.higherKey(lastClusterIndex)) != null)
+            dataClustersDirty.remove(higherKey);
     }
 
     protected void writeAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
