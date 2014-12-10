@@ -33,8 +33,8 @@ public class FileSystemTest {
     }
 
     private static void doTest() throws Exception {
-        basicFileTest();
-        rootDirectory.flush();
+        longFileTest();
+        //rootDirectory.flush();
     }
 
     public static void longFileTest() throws Exception {
@@ -48,7 +48,7 @@ public class FileSystemTest {
             }
         }
 
-        mainTxt.flush();
+        //mainTxt.flush();
 
         mainTxt.seek(0);
         for(int i = 0; i < 1024; i++) {
@@ -74,7 +74,7 @@ public class FileSystemTest {
                 mainTxt.seek(2);
                 mainTxt.writeShort(6);
 
-                mainTxt.flush();
+                //mainTxt.flush();
 
                 System.out.println("CREATE " + i);
             } else {
@@ -88,6 +88,6 @@ public class FileSystemTest {
                 throw new RuntimeException("INVALID2");
         }
 
-        rootDirectory.flush();
+        //rootDirectory.flush();
     }
 }

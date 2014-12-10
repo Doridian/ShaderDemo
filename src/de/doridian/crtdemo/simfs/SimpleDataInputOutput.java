@@ -3,6 +3,24 @@ package de.doridian.crtdemo.simfs;
 import java.io.*;
 
 public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
+    protected boolean directAutoFlush = false;
+    private int autoFlushDisabled = 0;
+
+    protected void enableAutoFlush() {
+        autoFlushDisabled--;
+    }
+
+    protected void disableAutoFlush() {
+        autoFlushDisabled++;
+    }
+
+    private void doAutoFlush() throws IOException {
+        if(autoFlushDisabled == 0 && directAutoFlush)
+            flush();
+    }
+
+    public abstract void flush() throws IOException;
+
     // 'Read' primitives
 
     /**
@@ -156,7 +174,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
         seek(newpos);
 
         /* return the actual number of bytes skipped */
-        return (int) (newpos - pos);
+        return newpos - pos;
     }
 
     // 'Write' primitives
@@ -169,7 +187,8 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      * @exception  IOException  if an I/O error occurs.
      */
     public void write(int b) throws IOException {
-        write(new byte[] { (byte)b });
+        writeBytes(new byte[] { (byte)b }, 0, 1);
+        doAutoFlush();
     }
 
     /**
@@ -190,6 +209,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      */
     public void write(byte b[]) throws IOException {
         writeBytes(b, 0, b.length);
+        doAutoFlush();
     }
 
     /**
@@ -203,6 +223,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      */
     public void write(byte b[], int off, int len) throws IOException {
         writeBytes(b, off, len);
+        doAutoFlush();
     }
 
     // 'Random access' stuff
@@ -611,8 +632,11 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      * @exception  IOException  if an I/O error occurs.
      */
     public final void writeShort(int v) throws IOException {
+        disableAutoFlush();
         write((v >>> 8) & 0xFF);
         write((v >>> 0) & 0xFF);
+        enableAutoFlush();
+        doAutoFlush();
         //written += 2;
     }
 
@@ -625,8 +649,11 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      * @exception  IOException  if an I/O error occurs.
      */
     public final void writeChar(int v) throws IOException {
+        disableAutoFlush();
         write((v >>> 8) & 0xFF);
         write((v >>> 0) & 0xFF);
+        enableAutoFlush();
+        doAutoFlush();
         //written += 2;
     }
 
@@ -638,10 +665,13 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      * @exception  IOException  if an I/O error occurs.
      */
     public final void writeInt(int v) throws IOException {
+        disableAutoFlush();
         write((v >>> 24) & 0xFF);
         write((v >>> 16) & 0xFF);
         write((v >>>  8) & 0xFF);
         write((v >>>  0) & 0xFF);
+        enableAutoFlush();
+        doAutoFlush();
         //written += 4;
     }
 
@@ -653,6 +683,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      * @exception  IOException  if an I/O error occurs.
      */
     public final void writeLong(long v) throws IOException {
+        disableAutoFlush();
         write((int)(v >>> 56) & 0xFF);
         write((int)(v >>> 48) & 0xFF);
         write((int)(v >>> 40) & 0xFF);
@@ -661,6 +692,8 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
         write((int)(v >>> 16) & 0xFF);
         write((int)(v >>>  8) & 0xFF);
         write((int)(v >>>  0) & 0xFF);
+        enableAutoFlush();
+        doAutoFlush();
         //written += 8;
     }
 
@@ -708,6 +741,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
         byte[] b = new byte[len];
         s.getBytes(0, len, b, 0);
         writeBytes(b, 0, len);
+        doAutoFlush();
     }
 
     /**
@@ -731,6 +765,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
             b[j++] = (byte)(c[i] >>> 0);
         }
         writeBytes(b, 0, blen);
+        doAutoFlush();
     }
 
     /**

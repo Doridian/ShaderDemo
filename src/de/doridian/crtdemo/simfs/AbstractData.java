@@ -13,6 +13,8 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable, IA
     protected final FileSystem fileSystem;
     String name;
 
+    protected boolean autoFlush = false;
+
     protected TreeMap<Integer, byte[]> dataClustersDirty = new TreeMap<>();
     protected int lastClusterIndex = 0;
     protected boolean attributesDirty;
@@ -23,6 +25,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable, IA
 
     public AbstractData(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
+        setAutoFlush(true);
     }
 
     protected int getSetAttributes() {
@@ -197,5 +200,10 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable, IA
     @Override
     public void close() throws IOException {
         flush();
+    }
+
+    @Override
+    public void setAutoFlush(boolean autoFlush) {
+        this.autoFlush = autoFlush;
     }
 }

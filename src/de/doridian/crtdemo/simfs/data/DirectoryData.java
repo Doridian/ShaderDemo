@@ -67,6 +67,9 @@ public class DirectoryData extends AbstractData implements IDirectoryData {
         if(fileLocation >= 0) {
             seek(fileLocation);
             writeShort(0);
+
+            if(autoFlush)
+                flush();
         }
     }
 
@@ -88,6 +91,9 @@ public class DirectoryData extends AbstractData implements IDirectoryData {
 
         seek(getFreeLocation());
         writeShort(file.attributeCluster.location);
+
+        if(autoFlush)
+            flush();
     }
 
     @Override
@@ -118,7 +124,7 @@ public class DirectoryData extends AbstractData implements IDirectoryData {
         return files.toArray(new IAbstractData[files.size()]);
     }
 
-    public void compact() throws IOException {
+    private void compact() throws IOException {
         IAbstractData[] allFiles = listFiles();
         seek(0);
         for(IAbstractData file : allFiles)
