@@ -20,7 +20,7 @@ public class FileSystemTest {
             if (mainTxt == null) {
                 mainTxt = new FileData(fs);
                 mainTxt.setName("main_" + i + ".txt");
-                mainTxt.flush();
+                //mainTxt.flush();
 
                 mainTxt.seek(0);
                 mainTxt.writeShort(5);

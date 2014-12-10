@@ -122,8 +122,6 @@ public class FileSystem {
 
     public void writeData(AbstractData data) throws IOException {
         if(data.attributeCluster == null) {
-            deleteData(data);
-
             data.attributesDirty = true;
             data.attributeCluster = allocateCluster(false);
             data.attributeCluster.setAttribute(Cluster.ATTRIBUTE_FIRST, true);

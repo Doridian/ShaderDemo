@@ -29,4 +29,11 @@ public class Util {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public static void printByteArray(String p, byte[] arr) {
+		System.out.print(p + ": ");
+		for(byte b : arr)
+			System.out.print(b + " ");
+		System.out.println();
+	}
 }
