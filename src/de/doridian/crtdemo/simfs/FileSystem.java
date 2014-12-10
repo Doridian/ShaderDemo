@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
 public class FileSystem {
     public static int HEADER_SIZE = 1 + 2;
 
-    public final int clusterSize; //unsigned byte
+    public final int clusterSize; //unsigned short
     public final int numClusters; //unsigned short
 
     final RandomAccessFile randomAccessFile;
@@ -38,14 +38,14 @@ public class FileSystem {
     public static FileSystem create(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
         file.setLength(HEADER_SIZE);
         file.seek(0);
-        file.writeByte(clusterSize);
+        file.writeShort(clusterSize);
         file.writeShort(numClusters);
         return new FileSystem(clusterSize, numClusters, file, false);
     }
 
     public static FileSystem read(RandomAccessFile file) throws IOException {
         file.seek(0);
-        int clusterSize = file.readUnsignedByte();
+        int clusterSize = file.readUnsignedShort();
         int numClusters = file.readUnsignedShort();
         return new FileSystem(clusterSize, numClusters, file, true);
     }

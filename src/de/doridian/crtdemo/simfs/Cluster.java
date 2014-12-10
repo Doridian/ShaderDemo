@@ -3,7 +3,7 @@ package de.doridian.crtdemo.simfs;
 import java.io.*;
 
 public class Cluster {
-    public final static short HEADER_SIZE = 1 + 2 + 1;
+    public final static short HEADER_SIZE = 1 + 2 + 2;
 
     final FileSystem fileSystem;
     public final int location; //unsigned short
@@ -25,7 +25,7 @@ public class Cluster {
     public byte[] read(int offset, int maxLen) throws IOException {
         if(!readHead())
             fileSystem.randomAccessFile.skipBytes(2);
-        int dataSize = fileSystem.randomAccessFile.readUnsignedByte();
+        int dataSize = fileSystem.randomAccessFile.readUnsignedShort();
         if(offset > 0)
             dataSize -= offset;
         if(dataSize <= 0)
@@ -62,7 +62,7 @@ public class Cluster {
             throw new IOException("Too big");
         writeHead();
 
-        fileSystem.randomAccessFile.writeByte(contents.length);
+        fileSystem.randomAccessFile.writeShort(contents.length);
         fileSystem.randomAccessFile.write(contents, 0, contents.length);
     }
 
