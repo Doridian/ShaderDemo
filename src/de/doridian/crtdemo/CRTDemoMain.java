@@ -222,6 +222,8 @@ public class CRTDemoMain extends OpenGLMain {
 				final DriveGroup driveGroup;
 				try {
 					driveGroup = new DriveGroup(new File("data/filesystem"));
+					if(!driveGroup.drives.containsKey('A'))
+						driveGroup.drives.put('A', null);
 				} catch (IOException e) {
 					e.printStackTrace();
 					io.print("ERROR\n");
@@ -232,7 +234,13 @@ public class CRTDemoMain extends OpenGLMain {
 				final TreeMap<Character, IFileSystem> drives = driveGroup.getDrives();
 
 				for(Map.Entry<Character, IFileSystem> drive : drives.entrySet()) {
-					io.print("" + drive.getKey() + ":" + FileSystem.PATH_SEPARATOR + " " + drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
+					io.print("" + drive.getKey() + ":" + FileSystem.PATH_SEPARATOR);
+
+					if(drive.getValue() != null)
+						io.print(" " + drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
+					else
+						io.print(" EMPTY\n");
+
 					doSleep(2000);
 				}
 
@@ -244,7 +252,7 @@ public class CRTDemoMain extends OpenGLMain {
 					doSleep(1000);
 
 					if(drives.get(driveLetter) == null) {
-						io.print("NO DRIVE\n");
+						io.print("NO DISK\n");
 						continue;
 					}
 

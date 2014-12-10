@@ -11,7 +11,7 @@ import java.util.TreeMap;
 
 public class DriveGroup {
     public char currentDrive = 'C';
-    private TreeMap<Character, IFileSystem> drives = new TreeMap<>();
+    public TreeMap<Character, IFileSystem> drives = new TreeMap<>();
 
     private final File folder;
 
