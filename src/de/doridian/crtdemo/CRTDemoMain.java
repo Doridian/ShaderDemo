@@ -193,6 +193,14 @@ public class CRTDemoMain extends OpenGLMain {
 				try { Thread.sleep(millis / THREAD_SLEEP_DIVIDER); } catch (InterruptedException e) { }
 			}
 
+			private void printLoad(char c, int count, int totalTime, String endStr) {
+				for(int i = 0; i < count; i++) {
+					doSleep(totalTime / count);
+					io.print(c);
+				}
+				io.print(endStr);
+			}
+
 			private void halt() {
 				io.print("\n=== CPU HALT ===\n");
 			}
@@ -211,13 +219,10 @@ public class CRTDemoMain extends OpenGLMain {
 				}
 				//
 
-				io.print("foxBIOS v0.1b\nHit return to boot ");
-				io.readLine();
-				io.print("Booting...\n");
-
-				doSleep(500);
-				io.print("Initializing disks...\n");
-				doSleep(2000);
+				io.print("foxBIOS v0.1b\nCore booting");
+				printLoad('.', 3, 3000, " OK\n");
+				io.print("Initializing disk bus");
+				printLoad('.', 3, 2000, " OK\n");
 
 				final DriveGroup driveGroup;
 				try {
@@ -234,22 +239,22 @@ public class CRTDemoMain extends OpenGLMain {
 				final TreeMap<Character, IFileSystem> drives = driveGroup.getDrives();
 
 				for(Map.Entry<Character, IFileSystem> drive : drives.entrySet()) {
-					io.print("" + drive.getKey() + ":" + FileSystem.PATH_SEPARATOR);
+					io.print("" + drive.getKey() + ":" + FileSystem.PATH_SEPARATOR + " ");
+
+					printLoad('.', 3, 500, " ");
 
 					if(drive.getValue() != null)
-						io.print(" " + drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
+						io.print(drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
 					else
-						io.print(" EMPTY\n");
-
-					doSleep(2000);
+						io.print("EMPTY\n");
 				}
 
-				io.print("All disks initialized.\nFinding boot.basic...\n");
+				io.print("All disks initialized.\nFinding boot.basic\n");
 
 				for(Character driveLetter : drives.navigableKeySet()) {
 					String bootFileName = driveLetter + ":" + FileSystem.PATH_SEPARATOR + "boot.basic";
-					io.print("Trying " + bootFileName + " ");
-					doSleep(1000);
+					io.print("Trying " + bootFileName);
+					printLoad('.', 3, 1000, " ");
 
 					if(drives.get(driveLetter) == null) {
 						io.print("NO DISK\n");
@@ -268,18 +273,20 @@ public class CRTDemoMain extends OpenGLMain {
 						continue;
 					}
 
+					io.print("FOUND\n");
+
 					BaseCompiledProgram program;
 
 					try {
 						CodeParser parser = new CodeParser(bootFile, true);
 						program = parser.compile();
 					} catch (Exception e) {
-						io.print("ERROR\n");
+						io.print("LOAD ERROR. Trying next.\n");
 						continue;
 					}
 
-					io.print("OK\nInvoking...");
-					doSleep(1000);
+					io.print("COMPILE OK. Invoking");
+					printLoad('.', 3, 1000, "\n");
 
 					driveGroup.currentDrive = driveLetter;
 
