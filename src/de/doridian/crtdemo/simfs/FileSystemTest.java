@@ -33,6 +33,7 @@ public class FileSystemTest {
     }
 
     private static void doTest() throws Exception {
+        deepFileTest();
         longFileTest();
         //rootDirectory.flush();
     }
@@ -60,13 +61,30 @@ public class FileSystemTest {
         }
     }
 
-    public static void basicFileTest() throws Exception {
-        System.out.println(rootDirectory.listFiles().length);
+    public static void deepFileTest() throws Exception {
+        IDirectoryData directory = rootDirectory;
         for(int i = 0; i < 10; i++) {
-            IFileData mainTxt = (IFileData)rootDirectory.findFile("main_" + i + ".txt");
+            IDirectoryData subDirectory = (IDirectoryData)directory.findFile("d" + i);
+            if(subDirectory == null) {
+                subDirectory = directory.createDirectory("d" + i);
+                System.out.println("D CREATE " + i);
+            } else {
+                System.out.println("D FOUND " + i);
+            }
+
+            basicFileTest(subDirectory);
+
+            directory = subDirectory;
+        }
+    }
+
+    public static void basicFileTest(IDirectoryData directoryData) throws Exception {
+        //System.out.println(directoryData.listFiles().length);
+        for(int i = 0; i < 10; i++) {
+            IFileData mainTxt = (IFileData)directoryData.findFile("main_" + i + ".txt");
 
             if (mainTxt == null) {
-                mainTxt = rootDirectory.createFile("main_" + i + ".txt");
+                mainTxt = directoryData.createFile("main_" + i + ".txt");
                 //mainTxt.flush();
 
                 mainTxt.seek(0);
@@ -76,9 +94,9 @@ public class FileSystemTest {
 
                 //mainTxt.flush();
 
-                System.out.println("CREATE " + i);
+                System.out.println("F CREATE " + i);
             } else {
-                System.out.println("FOUND " + i);
+                System.out.println("F FOUND " + i);
             }
 
             mainTxt.seek(0);
