@@ -3,12 +3,14 @@ package de.doridian.crtdemo.simfs;
 import com.google.common.collect.MapMaker;
 import de.doridian.crtdemo.simfs.data.DirectoryData;
 import de.doridian.crtdemo.simfs.data.FileData;
+import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
+import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.ConcurrentMap;
 
-public class FileSystem {
+public class FileSystem implements IFileSystem {
     public static int HEADER_SIZE = 2 + 2;
 
     public final int clusterSize; //unsigned short
@@ -30,9 +32,10 @@ public class FileSystem {
 
         DirectoryData rootDirectory;
         try {
-            rootDirectory = (DirectoryData)readData(0);
+            rootDirectory = (DirectoryData)readData(null, 0);
         } catch (NotValidDataException e) {
             rootDirectory = new DirectoryData(this);
+            rootDirectory.parent = null;
             rootDirectory.setName("ROOT");
             rootDirectory.flush();
         }
@@ -40,7 +43,11 @@ public class FileSystem {
         this.rootDirectory = rootDirectory;
     }
 
-    public static FileSystem create(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
+    public IDirectoryData getRootDirectory() {
+        return rootDirectory;
+    }
+
+    public static IFileSystem create(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
         file.setLength(HEADER_SIZE);
         file.seek(0);
         file.writeShort(clusterSize);
@@ -48,7 +55,7 @@ public class FileSystem {
         return new FileSystem(clusterSize, numClusters, file);
     }
 
-    public static FileSystem read(RandomAccessFile file) throws IOException {
+    public static IFileSystem read(RandomAccessFile file) throws IOException {
         file.seek(0);
         int clusterSize = file.readUnsignedShort();
         int numClusters = file.readUnsignedShort();
@@ -106,7 +113,7 @@ public class FileSystem {
 
     }
 
-    public AbstractData readData(int startCluster) throws IOException {
+    public AbstractData readData(DirectoryData parent, int startCluster) throws IOException {
         if(dataWeakHashMap.containsKey(startCluster))
             return dataWeakHashMap.get(startCluster);
 
@@ -124,6 +131,7 @@ public class FileSystem {
 
         data.lastClusterIndex = -1;
         data.attributeCluster = firstCluster;
+        data.parent = parent;
 
         dataWeakHashMap.put(startCluster, data);
 

@@ -1,12 +1,16 @@
 package de.doridian.crtdemo.simfs;
 
 import de.doridian.crtdemo.simfs.data.FileData;
+import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
+import de.doridian.crtdemo.simfs.interfaces.IFileData;
+import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class FileSystemTest {
-    private static FileSystem fs;
+    private static IFileSystem fs;
+    private static IDirectoryData rootDirectory;
     private static RandomAccessFile file = null;
 
     public static void main(String[] args) throws Exception {
@@ -26,25 +30,23 @@ public class FileSystemTest {
             fs = FileSystem.create(512, 32000, file);
         else
             fs = FileSystem.read(file);
+        rootDirectory = fs.getRootDirectory();
     }
 
     private static void doTest() throws Exception {
         longFileTest();
-        fs.rootDirectory.flush();
+        rootDirectory.flush();
     }
 
     public static void longFileTest() throws Exception {
-        FileData mainTxt = (FileData)fs.rootDirectory.findFile("test.bin");
+        IFileData mainTxt = (IFileData)rootDirectory.findFile("test.bin");
         if(mainTxt == null) {
-            mainTxt = new FileData(fs);
-            mainTxt.setName("test.bin");
+            mainTxt = rootDirectory.createFile("test.bin");
 
             mainTxt.seek(0);
             for(int i = 0; i < 1024; i++) {
                 mainTxt.writeInt(i);
             }
-
-            fs.rootDirectory.addFile(mainTxt);
         }
 
         //mainTxt.flush();
@@ -60,13 +62,12 @@ public class FileSystemTest {
     }
 
     public static void basicFileTest() throws Exception {
-        System.out.println(fs.rootDirectory.listFiles().length);
+        System.out.println(rootDirectory.listFiles().length);
         for(int i = 0; i < 10; i++) {
-            FileData mainTxt = (FileData)fs.rootDirectory.findFile("main_" + i + ".txt");
+            IFileData mainTxt = (IFileData)rootDirectory.findFile("main_" + i + ".txt");
 
             if (mainTxt == null) {
-                mainTxt = new FileData(fs);
-                mainTxt.setName("main_" + i + ".txt");
+                mainTxt = rootDirectory.createFile("main_" + i + ".txt");
                 //mainTxt.flush();
 
                 mainTxt.seek(0);
@@ -75,8 +76,6 @@ public class FileSystemTest {
                 mainTxt.writeShort(6);
 
                 mainTxt.flush();
-
-                fs.rootDirectory.addFile(mainTxt);
 
                 System.out.println("CREATE " + i);
             } else {
@@ -90,6 +89,6 @@ public class FileSystemTest {
                 throw new RuntimeException("INVALID2");
         }
 
-        fs.rootDirectory.flush();
+        rootDirectory.flush();
     }
 }

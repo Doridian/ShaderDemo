@@ -145,8 +145,8 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      * @exception  IOException  if an I/O error occurs.
      */
     public int skipBytes(int n) throws IOException {
-        long pos;
-        long newpos;
+        int pos;
+        int newpos;
 
         if (n <= 0) {
             return 0;
@@ -230,7 +230,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
      * @exception  IOException  if <code>pos</code> is less than
      *                          <code>0</code> or if an I/O error occurs.
      */
-    public abstract void seek(long pos) throws IOException;
+    public abstract void seek(int pos) throws IOException;
 
     //
     //  Some "reading/writing Java data types" methods stolen from
@@ -530,7 +530,7 @@ public abstract class SimpleDataInputOutput implements DataOutput, DataInput {
                     break;
                 case '\r':
                     eol = true;
-                    long cur = getFilePointer();
+                    int cur = getFilePointer();
                     if ((read()) != '\n') {
                         seek(cur);
                     }

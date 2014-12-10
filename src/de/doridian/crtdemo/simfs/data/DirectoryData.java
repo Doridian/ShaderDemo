@@ -3,12 +3,15 @@ package de.doridian.crtdemo.simfs.data;
 import de.doridian.crtdemo.simfs.AbstractData;
 import de.doridian.crtdemo.simfs.Cluster;
 import de.doridian.crtdemo.simfs.FileSystem;
+import de.doridian.crtdemo.simfs.interfaces.IAbstractData;
+import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
+import de.doridian.crtdemo.simfs.interfaces.IFileData;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class DirectoryData extends AbstractData {
+public class DirectoryData extends AbstractData implements IDirectoryData {
     public DirectoryData(FileSystem fileSystem) {
         super(fileSystem);
     }
@@ -25,7 +28,7 @@ public class DirectoryData extends AbstractData {
             while ((nextCluster = readUnsignedShort()) != -1) {
                 if(nextCluster == 0)
                     continue;
-                AbstractData data = fileSystem.readData(nextCluster);
+                AbstractData data = fileSystem.readData(this, nextCluster);
                 if(data.getName().equals(fileName))
                     return data;
             }
@@ -67,34 +70,59 @@ public class DirectoryData extends AbstractData {
         }
     }
 
+    public void addFile(AbstractData file, String name) throws IOException {
+        file.setName(name);
+        addFile(file);
+    }
+
     public void addFile(AbstractData file) throws IOException {
         if(getFileLocation(file) >= 0)
             return;
+
+        if(file.parent != null)
+            file.parent.deleteFile(file);
+        file.parent = this;
+
         if(file.attributeCluster == null)
             file.flush();
+
         seek(getFreeLocation());
         writeShort(file.attributeCluster.location);
     }
 
-    public AbstractData[] listFiles() throws IOException {
+    @Override
+    public IFileData createFile(String name) throws IOException {
+        FileData newFile = new FileData(fileSystem);
+        addFile(newFile, name);
+        return newFile;
+    }
+
+    @Override
+    public IDirectoryData createDirectory(String name) throws IOException {
+        DirectoryData newFile = new DirectoryData(fileSystem);
+        addFile(newFile, name);
+        return newFile;
+    }
+
+    public IAbstractData[] listFiles() throws IOException {
         seek(0);
-        ArrayList<AbstractData> files = new ArrayList<>();
+        ArrayList<IAbstractData> files = new ArrayList<>();
         try {
             int nextCluster;
             while ((nextCluster = readUnsignedShort()) != -1) {
                 if(nextCluster == 0)
                     continue;
-                files.add(fileSystem.readData(nextCluster));
+                files.add(fileSystem.readData(this, nextCluster));
             }
         } catch (EOFException e) { }
-        return files.toArray(new AbstractData[files.size()]);
+        return files.toArray(new IAbstractData[files.size()]);
     }
 
     public void compact() throws IOException {
-        AbstractData[] allFiles = listFiles();
+        IAbstractData[] allFiles = listFiles();
         seek(0);
-        for(AbstractData file : allFiles)
-            writeShort(file.attributeCluster.location);
+        for(IAbstractData file : allFiles)
+            writeShort(((AbstractData)file).attributeCluster.location);
         writeEOF();
     }
 

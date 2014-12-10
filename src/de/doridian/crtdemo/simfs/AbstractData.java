@@ -1,10 +1,14 @@
 package de.doridian.crtdemo.simfs;
 
+import de.doridian.crtdemo.simfs.data.DirectoryData;
+import de.doridian.crtdemo.simfs.interfaces.IAbstractData;
+import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.TreeMap;
 
-public class AbstractData extends SimpleDataInputOutput implements Closeable {
+public class AbstractData extends SimpleDataInputOutput implements Closeable, IAbstractData {
     public Cluster attributeCluster;
     protected final FileSystem fileSystem;
     String name;
@@ -14,6 +18,8 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
     protected boolean attributesDirty;
 
     private int currentPos = 0;
+
+    public DirectoryData parent = null;
 
     public AbstractData(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
@@ -99,7 +105,13 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
     }
 
     public void delete() throws IOException {
+        parent.deleteFile(this);
         fileSystem.deleteData(this);
+    }
+
+    public void moveTo(IDirectoryData directoryData) throws IOException {
+        DirectoryData toDirectory = (DirectoryData)directoryData;
+        toDirectory.addFile(this);
     }
 
     protected int readAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
@@ -178,8 +190,8 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
     }
 
     @Override
-    public void seek(long pos) throws IOException {
-        currentPos = (int)pos;
+    public void seek(int pos) throws IOException {
+        currentPos = pos;
     }
 
     @Override
