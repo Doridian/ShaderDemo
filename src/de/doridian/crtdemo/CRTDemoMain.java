@@ -14,9 +14,11 @@ import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.rmi.server.ExportException;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CRTDemoMain extends OpenGLMain {
@@ -158,12 +160,13 @@ public class CRTDemoMain extends OpenGLMain {
 			public void run() {
 				final BasicIO io = new CRTBasicIO();
 
-				io.print("Loading FileSystem... ");
-
-				final IFileSystem fileSystem;
 				doSleep(500);
+				io.print("Initializing disks...\n");
+				doSleep(2000);
+
+				final DriveGroup driveGroup;
 				try {
-					fileSystem = FileSystem.read(new RandomAccessFile("data/filesystem", "rw"));
+					driveGroup = new DriveGroup(new File("data/filesystem"));
 				} catch (IOException e) {
 					e.printStackTrace();
 					io.print("ERROR\n");
@@ -171,8 +174,12 @@ public class CRTDemoMain extends OpenGLMain {
 					return;
 				}
 
-				io.print("OK\nC:\\ " + fileSystem.getClusterCount() + "C, " + fileSystem.getClusterSize() + "BPC\n");
+				for(Map.Entry<Character, IFileSystem> drive : driveGroup.getDrives().entrySet()) {
+					io.print(drive.getKey() + ":\\ " + drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
+					doSleep(2000);
+				}
 
+				io.print("All disks initialized.\nBooting C:\\bios.basic\n");
 				doSleep(2000);
 
 				CodeParser parser = new CodeParser(Util.readFile("data/test.basic"), true);

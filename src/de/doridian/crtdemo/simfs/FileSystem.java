@@ -3,6 +3,7 @@ package de.doridian.crtdemo.simfs;
 import com.google.common.collect.MapMaker;
 import de.doridian.crtdemo.simfs.data.DirectoryData;
 import de.doridian.crtdemo.simfs.data.FileData;
+import de.doridian.crtdemo.simfs.interfaces.IAbstractData;
 import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
 import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 
@@ -11,10 +12,14 @@ import java.io.RandomAccessFile;
 import java.util.concurrent.ConcurrentMap;
 
 public class FileSystem implements IFileSystem {
+    public static char PATH_SEPARATOR = '\\';
+
     public static int HEADER_SIZE = 2 + 2;
 
     public final int clusterSize; //unsigned short
     public final int numClusters; //unsigned short
+
+    private IDirectoryData cwd;
 
     final RandomAccessFile randomAccessFile;
 
@@ -41,6 +46,7 @@ public class FileSystem implements IFileSystem {
         }
 
         this.rootDirectory = rootDirectory;
+        this.cwd = rootDirectory;
     }
 
     @Override
@@ -51,6 +57,40 @@ public class FileSystem implements IFileSystem {
     @Override
     public int getClusterCount() {
         return numClusters;
+    }
+
+    @Override
+    public void setCWD(IDirectoryData cwd) throws IOException {
+        if(cwd == null)
+            this.cwd = rootDirectory;
+        else
+            this.cwd = cwd;
+    }
+
+    @Override
+    public IDirectoryData getCWD() throws IOException {
+        return cwd;
+    }
+
+    @Override
+    public IAbstractData getFile(String name) throws IOException {
+        IAbstractData baseDir;
+        if(name.charAt(0) == PATH_SEPARATOR)
+            baseDir = rootDirectory;
+        else
+            baseDir = cwd;
+
+        String[] pathComponents = name.split(PATH_SEPARATOR + "+");
+        for(String pathComponent : pathComponents) {
+            if(pathComponent.isEmpty() || pathComponent.equals("."))
+                continue;
+            if(pathComponent.equals(".."))
+                baseDir = baseDir.getParent();
+            else
+                baseDir = ((IDirectoryData)baseDir).findFile(pathComponent);
+        }
+
+        return baseDir;
     }
 
     public IDirectoryData getRootDirectory() {

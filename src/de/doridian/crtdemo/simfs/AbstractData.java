@@ -45,6 +45,13 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable, IA
         this.attributesDirty = true;
     }
 
+    @Override
+    public String getAbsolutePath() {
+        if(parent != null)
+            return parent.getAbsolutePath() + FileSystem.PATH_SEPARATOR + getName();
+        return "" + FileSystem.PATH_SEPARATOR;
+    }
+
     int getClusterDataSize() {
         return fileSystem.clusterSize - Cluster.HEADER_SIZE;
     }
@@ -54,6 +61,11 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable, IA
             return dataClustersDirty.get(cluster);
         else
             return fileSystem.getCluster(cluster).read();
+    }
+
+    @Override
+    public IDirectoryData getParent() throws IOException {
+        return parent;
     }
 
     public void setLength(int len) throws IOException {
