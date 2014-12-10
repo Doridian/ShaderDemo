@@ -64,11 +64,15 @@ public class CRTDemoMain extends OpenGLMain {
 	}
 
 	public static void writeChar(char c) {
-		if(posY >= 16)
-			doScrollUp();
+		scrollUp();
 		screenCursorOff[posY][posX] = c;
 		screenCursorOn[posY][posX] = c;
 		refreshCursor();
+	}
+
+	public static void scrollUp() {
+		if(posY >= 16)
+			doScrollUp();
 	}
 
 	public static void nextLine() {
@@ -77,11 +81,13 @@ public class CRTDemoMain extends OpenGLMain {
 	}
 
 	public static void moveForward() {
-		if(++posX >= 32) {
-			posX %= 32;
+		++posX;
+		while(posX >= 32) {
+			posX -= 32;
 			++posY;
 		}
 		refreshCursor();
+		scrollUp();
 	}
 
 	private static int cursorX = 0, cursorY = 0;
@@ -98,12 +104,14 @@ public class CRTDemoMain extends OpenGLMain {
 
 	public static void doScrollUp() {
 		posX = 0;
+		int mov = posY - 15;
 		posY = 15;
-		for(int i = 1; i < 16; i++) {
-			screenCursorOff[i - 1] = screenCursorOff[i];
-			System.arraycopy(screenCursorOff[i], 0, screenCursorOn[i - 1], 0, 32);
+		for(int i = mov; i < 16; i++) {
+			screenCursorOff[i - mov] = screenCursorOff[i];
+			System.arraycopy(screenCursorOff[i - mov], 0, screenCursorOn[i - mov], 0, 32);
 		}
-		blankLine(15);
+		for(int i = 16 - mov; i < 16; i++)
+			blankLine(i);
 		refreshCursor();
 	}
 
@@ -175,11 +183,17 @@ public class CRTDemoMain extends OpenGLMain {
 	public static void main(String[] args) throws Exception {
 		blankScreen();
 
-		final int THREAD_SLEEP_DIVIDER = 1;
+		final int THREAD_SLEEP_DIVIDER = 10;
 
 		Thread basicThread = new Thread() {
+			private final BasicIO io = new CRTBasicIO();
+
 			private void doSleep(int millis) {
 				try { Thread.sleep(millis / THREAD_SLEEP_DIVIDER); } catch (InterruptedException e) { }
+			}
+
+			private void halt() {
+				io.print("\n=== CPU HALT ===\n");
 			}
 
 			public void run() {
@@ -195,8 +209,6 @@ public class CRTDemoMain extends OpenGLMain {
 					System.exit(0);
 				}
 				//
-
-				final BasicIO io = new CRTBasicIO();
 
 				io.print("foxBIOS v0.1b\nHit return to boot ");
 				io.readLine();
@@ -223,7 +235,7 @@ public class CRTDemoMain extends OpenGLMain {
 
 				io.print("All disks initialized.\nFinding boot.basic...\n");
 
-				for(char c = 'A'; c < 'D'; c++) {
+				for(char c = 'A'; c < 'Z'; c++) {
 					String bootFileName = "" + c + ":" + FileSystem.PATH_SEPARATOR + "boot.basic";
 					io.print("Trying " + bootFileName + " ");
 					doSleep(1000);
@@ -258,11 +270,12 @@ public class CRTDemoMain extends OpenGLMain {
 					doSleep(1000);
 
 					program.$start(io);
-
+					halt();
 					return;
 				}
 
-				io.print("--- NO BOOTABLE MEDIA ---");
+				io.print("\n=== NO BOOTABLE MEDIA ===\n");
+				halt();
 			}
 		};
 		basicThread.setDaemon(true);
