@@ -58,7 +58,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
             eofPos = 0;
         int lastCluster = getClusterFor(eofPos);
         byte[] cluster = readCluster(lastCluster);
-        byte[] endCluster = new byte[eofPos % getClusterDataSize()];
+        byte[] endCluster = new byte[(eofPos % getClusterDataSize()) + 1];
         if(cluster.length == endCluster.length)
             endCluster = cluster;
         else
