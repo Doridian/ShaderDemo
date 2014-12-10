@@ -1,11 +1,7 @@
 package de.doridian.crtdemo.simfs;
 
-import org.lwjgl.Sys;
-
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.TreeMap;
 
 public class AbstractData extends SimpleDataInputOutput implements Closeable {
@@ -48,6 +44,10 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
             return dataClustersDirty.get(cluster);
         else
             return fileSystem.getCluster(cluster).read();
+    }
+
+    protected void setLength(int len) {
+        //TODO
     }
 
     protected void writeAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
