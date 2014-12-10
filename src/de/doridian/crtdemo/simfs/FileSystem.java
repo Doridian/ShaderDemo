@@ -19,6 +19,7 @@ public class FileSystem {
     public final DirectoryData rootDirectory;
 
     private final ConcurrentMap<Integer, Cluster> clusterWeakHashMap = new MapMaker().weakValues().makeMap();
+    private final ConcurrentMap<Integer, AbstractData> dataWeakHashMap = new MapMaker().weakValues().makeMap();
 
     private FileSystem(int clusterSize, int numClusters, RandomAccessFile file, boolean rootDirectoryExists) throws IOException {
         this.clusterSize = clusterSize;
@@ -96,6 +97,9 @@ public class FileSystem {
             deallocateCluster(getCluster(cluster.nextCluster));
         cluster.setAttribute(Cluster.ATTRIBUTE_ALLOCATED, false);
         cluster.writeAttributes();
+
+        clusterWeakHashMap.remove(cluster.location);
+        dataWeakHashMap.remove(cluster.location);
     }
 
     public static class NotValidDataException extends IOException {
@@ -103,6 +107,9 @@ public class FileSystem {
     }
 
     public AbstractData readData(int startCluster) throws IOException {
+        if(dataWeakHashMap.containsKey(startCluster))
+            return dataWeakHashMap.get(startCluster);
+
         Cluster firstCluster = getCluster(startCluster);
         firstCluster.readAttributes();
         if(!firstCluster.hasAllAttributes(Cluster.ATTRIBUTE_FIRST | Cluster.ATTRIBUTE_ALLOCATED))
@@ -118,10 +125,12 @@ public class FileSystem {
         data.lastClusterIndex = -1;
         data.attributeCluster = firstCluster;
 
+        dataWeakHashMap.put(startCluster, data);
+
         return data;
     }
 
-    public void deleteData(AbstractData data) throws IOException {
+    void deleteData(AbstractData data) throws IOException {
         if(data.attributeCluster != null)
             deallocateCluster(data.attributeCluster);
 
@@ -131,12 +140,14 @@ public class FileSystem {
         data.dataClustersDirty.clear();
     }
 
-    public void writeData(AbstractData data) throws IOException {
+    void writeData(AbstractData data) throws IOException {
         if(data.attributeCluster == null) {
             data.attributesDirty = true;
             data.attributeCluster = allocateCluster(false);
             data.attributeCluster.setAttribute(Cluster.ATTRIBUTE_FIRST, true);
             data.attributeCluster.setAttribute(data.getSetAttributes(), true);
+
+            dataWeakHashMap.put(data.attributeCluster.location, data);
         }
 
         if(data.attributesDirty) {
