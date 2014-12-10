@@ -78,7 +78,7 @@ public class Cluster {
         headRead = true;
     }
 
-    public boolean isAttribute(int attribute) {
+    public boolean hasAllAttributes(int attribute) {
         return (attributes & attribute) == attribute;
     }
 

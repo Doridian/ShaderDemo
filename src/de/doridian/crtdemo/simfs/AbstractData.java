@@ -125,6 +125,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
         for(int cluster = 0; cluster <= endCluster; cluster++) {
             if(currentCluster != null) {
                 currentCluster.readHead();
+
                 if (currentCluster.nextCluster <= 0)
                     currentCluster = null;
                 else

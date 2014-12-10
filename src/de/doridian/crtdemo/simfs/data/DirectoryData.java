@@ -94,7 +94,6 @@ public class DirectoryData extends AbstractData {
         try {
             int nextCluster;
             while ((nextCluster = readUnsignedShort()) != -1) {
-                System.out.println("LF" + nextCluster);
                 if(nextCluster == 0)
                     continue;
                 files.add(fileSystem.readData(nextCluster));

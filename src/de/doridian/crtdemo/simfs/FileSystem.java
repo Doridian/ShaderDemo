@@ -65,7 +65,7 @@ public class FileSystem {
         for(int i = 0; i < numClusters; i++) {
             Cluster cluster = getCluster(i);
             cluster.readAttributes();
-            if(!cluster.isAttribute(Cluster.ATTRIBUTE_ALLOCATED)) {
+            if(!cluster.hasAllAttributes(Cluster.ATTRIBUTE_ALLOCATED)) {
                 cluster.attributes = Cluster.ATTRIBUTE_ALLOCATED;
                 cluster.nextCluster = 0;
                 if(clean)
@@ -80,7 +80,7 @@ public class FileSystem {
 
     void deallocateCluster(Cluster cluster) throws IOException {
         cluster.readHead();
-        if(!cluster.isAttribute(Cluster.ATTRIBUTE_ALLOCATED))
+        if(!cluster.hasAllAttributes(Cluster.ATTRIBUTE_ALLOCATED))
             return;
         if(cluster.nextCluster > 0)
             deallocateCluster(getCluster(cluster.nextCluster));
@@ -95,11 +95,11 @@ public class FileSystem {
     public AbstractData readData(int startCluster) throws IOException {
         Cluster firstCluster = getCluster(startCluster);
         firstCluster.readAttributes();
-        if(!firstCluster.isAttribute(Cluster.ATTRIBUTE_FIRST | Cluster.ATTRIBUTE_ALLOCATED))
+        if(!firstCluster.hasAllAttributes(Cluster.ATTRIBUTE_FIRST | Cluster.ATTRIBUTE_ALLOCATED))
             throw new NotValidDataException();
 
         AbstractData data;
-        if(firstCluster.isAttribute(Cluster.ATTRIBUTE_DIRECTORY))
+        if(firstCluster.hasAllAttributes(Cluster.ATTRIBUTE_DIRECTORY))
             data = new DirectoryData(this);
         else
             data = new FileData(this);
