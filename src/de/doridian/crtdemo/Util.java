@@ -1,10 +1,13 @@
 package de.doridian.crtdemo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 
 public class Util {
+	public static String readStreamFully(InputStream inputStream) {
+		java.util.Scanner s = new java.util.Scanner(inputStream).useDelimiter("\\A");
+		return s.hasNext() ? s.next() : "";
+	}
+
 	public static String readFile(String _file) {
 		try {
 			File file = new File(_file);
@@ -14,7 +17,7 @@ public class Util {
 			fis.close();
 
 			return new String(data, "UTF-8");
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -25,7 +28,7 @@ public class Util {
 			FileOutputStream fos = new FileOutputStream(file);
 			fos.write(content.getBytes("UTF-8"));
 			fos.close();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

@@ -28,7 +28,7 @@ public class FileSystemTest {
         if(file != null)
             file.close();
 
-        file = new RandomAccessFile("test.fs", "rw");
+        file = new RandomAccessFile("data/tmp/test.fs", "rw");
         if(reset)
             fs = FileSystem.create(512, 32000, file);
         else

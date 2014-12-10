@@ -66,9 +66,9 @@ public abstract class BaseCompiledProgram {
         try {
             while ((line = $runNextLine()) >= 0);
             if(!$cleanExit)
-                io.print("\n--- PROGRAM TERMINATED UNEXPECTEDLY ---\n");
+                io.print("\n--- PROGRAM REACHED EOF ---\n");
             else
-                io.print("\n--- PROGRAM TERMINATED NORMALLY ---\n");
+                io.print("\n--- PROGRAM TERMINATED ---\n");
         } catch (Exception e) {
             e.printStackTrace();
             io.print("\nERROR ON LINE " + line + ": " + e.getMessage() + "\n");

@@ -135,13 +135,17 @@ public class CRTDemoMain extends OpenGLMain {
 		}
 	}
 
+	private static MainShader makeShader(String resource) {
+		return new MainShader(ShaderProgram.VSH_DONOTHING, null, Util.readStreamFully(CRTDemoMain.class.getResourceAsStream("/" + resource + ".fsh")));
+	}
+
 	public static void main(String[] args) throws Exception {
 		for(int i = 0; i < 16; i++)
 			blankLine(i);
 
 		refreshCursor();
 
-		CodeParser parser = new CodeParser(Util.readFile("data/tmp/test.basic"), true);
+		CodeParser parser = new CodeParser(Util.readFile("data/test.basic"), true);
 		final BaseCompiledProgram program = parser.compile();
 		Thread basicThread = new Thread() {
 			public void run() {
@@ -161,15 +165,15 @@ public class CRTDemoMain extends OpenGLMain {
 			@Override
 			public void initialize() {
 				try {
-					font = new AngelCodeFont("data/greenscreen.fnt", new Image("data/greenscreen_0.png"), true);
+					font = new AngelCodeFont("greenscreen", CRTDemoMain.class.getResourceAsStream("/greenscreen.fnt"), CRTDemoMain.class.getResourceAsStream("/greenscreen_0.png"), true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
 				shaders = new MainShader[] {
-					new MainShader(ShaderProgram.VSH_DONOTHING, null, Util.readFile("data/scanlines.fsh")),
-					new MainShader(ShaderProgram.VSH_DONOTHING, null, Util.readFile("data/gblur_h.fsh")),
-					new MainShader(ShaderProgram.VSH_DONOTHING, null, Util.readFile("data/gblur_v.fsh"))
+					makeShader("scanlines"),
+					makeShader("gblur_h"),
+					makeShader("gblur_v")
 				};
 			}
 
