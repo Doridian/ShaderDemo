@@ -213,6 +213,7 @@ public class CRTDemoMain extends OpenGLMain {
 					IFileSystem fs = FileSystem.create(512, 32000, ranAF);
 					IFileData file = fs.getRootDirectory().createFile("boot.basic");
 					file.write(Util.readFile("data/test.basic").getBytes("ASCII"));
+					ranAF.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.exit(0);
