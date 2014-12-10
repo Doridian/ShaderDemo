@@ -40,8 +40,8 @@ public class FileSystemTest {
             mainTxt.setName("test.bin");
 
             mainTxt.seek(0);
-            for(int i = 0; i < 255; i++) {
-                mainTxt.writeByte(i);
+            for(int i = 0; i < 1024; i++) {
+                mainTxt.writeInt(i);
             }
 
             fs.rootDirectory.addFile(mainTxt);
@@ -50,8 +50,8 @@ public class FileSystemTest {
         //mainTxt.flush();
 
         mainTxt.seek(0);
-        for(int i = 0; i < 255; i++) {
-            int j = mainTxt.readUnsignedByte();
+        for(int i = 0; i < 1024; i++) {
+            int j = mainTxt.readInt();
             if(j != i) {
                 System.out.println("INVALID " + i + " != " + j);
                 System.exit(0);
