@@ -3,9 +3,7 @@ package de.doridian.crtdemo.simfs.data;
 import de.doridian.crtdemo.simfs.AbstractData;
 import de.doridian.crtdemo.simfs.Cluster;
 import de.doridian.crtdemo.simfs.FileSystem;
-import org.lwjgl.Sys;
 
-import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,7 +51,7 @@ public class DirectoryData extends AbstractData {
     private int getFreeLocation() throws IOException {
         int ret = getClusterLocation(0);
         if(ret < 0)
-            return getFilePointer() + 1;
+            return getFilePointer() + (getFilePointer() % 2);
         return ret;
     }
 

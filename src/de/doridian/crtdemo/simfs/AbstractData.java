@@ -70,6 +70,13 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
         lastClusterIndex = lastCluster;
     }
 
+    private static void printByteArray(String p, byte[] arr) {
+        System.out.print(p + ": ");
+        for(byte b : arr)
+            System.out.print(b + " ");
+        System.out.println();
+    }
+
     protected void writeAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
         if(attributeCluster == null)
             throw new IOException("Flush after creation");
@@ -79,7 +86,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
         int writtenData = 0;
 
         int oldPos = startCluster * getClusterDataSize();
-        byte[] oldData = new byte[(int) Math.ceil(((double) (len + (pos - oldPos))) / ((double) getClusterDataSize()))];
+        byte[] oldData = new byte[((int)Math.ceil(((double) (len + (pos - oldPos))) / ((double) getClusterDataSize()))) * getClusterDataSize()];
         int oldLen = readAbsolute(oldPos, oldData, 0, oldData.length);
 
         for(int cluster = startCluster; cluster <= endCluster; cluster++) {
