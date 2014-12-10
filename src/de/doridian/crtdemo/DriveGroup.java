@@ -7,11 +7,11 @@ import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class DriveGroup {
     public char currentDrive = 'C';
-    private HashMap<Character, IFileSystem> drives = new HashMap<>();
+    private TreeMap<Character, IFileSystem> drives = new TreeMap<>();
 
     private final File folder;
 
@@ -33,7 +33,7 @@ public class DriveGroup {
         return drives.get(driveLetter);
     }
 
-    public HashMap<Character, IFileSystem> getDrives() {
+    public TreeMap<Character, IFileSystem> getDrives() {
         return drives;
     }
 

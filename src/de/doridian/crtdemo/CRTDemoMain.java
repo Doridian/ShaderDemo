@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CRTDemoMain extends OpenGLMain {
@@ -183,7 +184,7 @@ public class CRTDemoMain extends OpenGLMain {
 	public static void main(String[] args) throws Exception {
 		blankScreen();
 
-		final int THREAD_SLEEP_DIVIDER = 10;
+		final int THREAD_SLEEP_DIVIDER = 1;
 
 		Thread basicThread = new Thread() {
 			private final BasicIO io = new CRTBasicIO();
@@ -228,18 +229,21 @@ public class CRTDemoMain extends OpenGLMain {
 					return;
 				}
 
-				for(Map.Entry<Character, IFileSystem> drive : driveGroup.getDrives().entrySet()) {
+				final TreeMap<Character, IFileSystem> drives = driveGroup.getDrives();
+
+				for(Map.Entry<Character, IFileSystem> drive : drives.entrySet()) {
 					io.print("" + drive.getKey() + ":" + FileSystem.PATH_SEPARATOR + " " + drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
 					doSleep(2000);
 				}
 
 				io.print("All disks initialized.\nFinding boot.basic...\n");
 
-				for(char c = 'A'; c < 'Z'; c++) {
-					String bootFileName = "" + c + ":" + FileSystem.PATH_SEPARATOR + "boot.basic";
+				for(Character driveLetter : drives.navigableKeySet()) {
+					String bootFileName = driveLetter + ":" + FileSystem.PATH_SEPARATOR + "boot.basic";
 					io.print("Trying " + bootFileName + " ");
 					doSleep(1000);
-					if(!driveGroup.getDrives().containsKey(c)) {
+
+					if(drives.get(driveLetter) == null) {
 						io.print("NO DRIVE\n");
 						continue;
 					}
@@ -266,8 +270,10 @@ public class CRTDemoMain extends OpenGLMain {
 						continue;
 					}
 
-					io.print("OK\n");
+					io.print("OK\nInvoking...");
 					doSleep(1000);
+
+					driveGroup.currentDrive = driveLetter;
 
 					program.$start(io);
 					halt();
