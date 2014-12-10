@@ -8,16 +8,16 @@ import de.doridian.crtdemo.shader.MainShader;
 import de.doridian.crtdemo.shader.OpenGLMain;
 import de.doridian.crtdemo.shader.ShaderProgram;
 import de.doridian.crtdemo.simfs.FileSystem;
+import de.doridian.crtdemo.simfs.interfaces.IFileData;
 import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.Image;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.rmi.server.ExportException;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -152,13 +152,32 @@ public class CRTDemoMain extends OpenGLMain {
 
 		refreshCursor();
 
+		final int THREAD_SLEEP_DIVIDER = 1;
+
 		Thread basicThread = new Thread() {
 			private void doSleep(int millis) {
-				try { Thread.sleep(millis); } catch (InterruptedException e) { }
+				try { Thread.sleep(millis / THREAD_SLEEP_DIVIDER); } catch (InterruptedException e) { }
 			}
 
 			public void run() {
+				//
+				try {
+					RandomAccessFile ranAF = new RandomAccessFile("data/filesystem/C", "rw");
+					ranAF.setLength(0);
+					IFileSystem fs = FileSystem.create(512, 32000, ranAF);
+					IFileData file = fs.getRootDirectory().createFile("boot.basic");
+					file.write(Util.readFile("data/test.basic").getBytes("ASCII"));
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.exit(0);
+				}
+				//
+
 				final BasicIO io = new CRTBasicIO();
+
+				io.print("foxBIOS v0.1b\nHit return to boot ");
+				io.getLine();
+				io.print("Booting...\n");
 
 				doSleep(500);
 				io.print("Initializing disks...\n");
@@ -175,17 +194,52 @@ public class CRTDemoMain extends OpenGLMain {
 				}
 
 				for(Map.Entry<Character, IFileSystem> drive : driveGroup.getDrives().entrySet()) {
-					io.print(drive.getKey() + ":\\ " + drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
+					io.print("" + drive.getKey() + ":" + FileSystem.PATH_SEPARATOR + " " + drive.getValue().getClusterCount() + "C, " + drive.getValue().getClusterSize() + "BPC\n");
 					doSleep(2000);
 				}
 
-				io.print("All disks initialized.\nBooting C:\\bios.basic\n");
-				doSleep(2000);
+				io.print("All disks initialized.\nFinding boot.basic...\n");
 
-				CodeParser parser = new CodeParser(Util.readFile("data/test.basic"), true);
-				final BaseCompiledProgram program = parser.compile();
+				for(char c = 'A'; c < 'D'; c++) {
+					String bootFileName = "" + c + ":" + FileSystem.PATH_SEPARATOR + "boot.basic";
+					io.print("Trying " + bootFileName + " ");
+					doSleep(1000);
+					if(!driveGroup.getDrives().containsKey(c)) {
+						io.print("NO DRIVE\n");
+						continue;
+					}
 
-				program.$start(io);
+					IFileData bootFile;
+
+					try {
+						bootFile = (IFileData)driveGroup.getFile(bootFileName);
+						if (bootFile == null)
+							throw new FileNotFoundException();
+					} catch (Exception e) {
+						e.printStackTrace();
+						io.print("NOT FOUND\n");
+						continue;
+					}
+
+					BaseCompiledProgram program;
+
+					try {
+						CodeParser parser = new CodeParser(bootFile, true);
+						program = parser.compile();
+					} catch (Exception e) {
+						io.print("ERROR\n");
+						continue;
+					}
+
+					io.print("OK\n");
+					doSleep(1000);
+
+					program.$start(io);
+
+					return;
+				}
+
+				io.print("--- NO BOOTABLE MEDIA ---");
 			}
 		};
 		basicThread.setDaemon(true);

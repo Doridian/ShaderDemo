@@ -108,8 +108,10 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable, IA
 
             byte[] clusterData = new byte[Math.max(curLen + curOffset, curOldLen)];
 
-            System.arraycopy(oldData, writtenData, clusterData, 0, curOldLen);
-            System.arraycopy(data, pos + writtenData, clusterData, curOffset, curLen);
+            if(curOldLen > 0)
+                System.arraycopy(oldData, writtenData, clusterData, 0, curOldLen);
+            if(curLen > 0)
+                System.arraycopy(data, pos + writtenData, clusterData, curOffset, curLen);
 
             writtenData += curLen;
             dataClustersDirty.put(cluster, clusterData);

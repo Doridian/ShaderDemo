@@ -75,9 +75,10 @@ public class FileSystem implements IFileSystem {
     @Override
     public IAbstractData getFile(String name) throws IOException {
         IAbstractData baseDir;
-        if(name.charAt(0) == PATH_SEPARATOR)
+        if(name.charAt(0) == PATH_SEPARATOR) {
+            name = name.substring(1);
             baseDir = rootDirectory;
-        else
+        } else
             baseDir = cwd;
 
         String[] pathComponents = name.split(PATH_SEPARATOR + "+");

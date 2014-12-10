@@ -23,10 +23,9 @@ public class FileData extends AbstractData implements IFileData {
         seek(0);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[4096];
-        int readLen = 0;
-        while((readLen = read(buffer, 0, buffer.length)) >= 0) {
+        int readLen;
+        while((readLen = read(buffer, 0, buffer.length)) > 0)
             baos.write(buffer, 0, readLen);
-        }
         return baos.toByteArray();
     }
 }
