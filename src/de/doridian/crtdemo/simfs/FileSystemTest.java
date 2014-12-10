@@ -1,6 +1,5 @@
 package de.doridian.crtdemo.simfs;
 
-import de.doridian.crtdemo.simfs.data.FileData;
 import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
 import de.doridian.crtdemo.simfs.interfaces.IFileData;
 import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
@@ -34,7 +33,7 @@ public class FileSystemTest {
     }
 
     private static void doTest() throws Exception {
-        longFileTest();
+        basicFileTest();
         rootDirectory.flush();
     }
 
@@ -49,7 +48,7 @@ public class FileSystemTest {
             }
         }
 
-        //mainTxt.flush();
+        mainTxt.flush();
 
         mainTxt.seek(0);
         for(int i = 0; i < 1024; i++) {
