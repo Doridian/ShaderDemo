@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
 import java.util.concurrent.ConcurrentMap;
 
 public class FileSystem {
-    public static int HEADER_SIZE = 1 + 2;
+    public static int HEADER_SIZE = 2 + 2;
 
     public final int clusterSize; //unsigned short
     public final int numClusters; //unsigned short
@@ -21,7 +21,7 @@ public class FileSystem {
     private final ConcurrentMap<Integer, Cluster> clusterWeakHashMap = new MapMaker().weakValues().makeMap();
     private final ConcurrentMap<Integer, AbstractData> dataWeakHashMap = new MapMaker().weakValues().makeMap();
 
-    private FileSystem(int clusterSize, int numClusters, RandomAccessFile file, boolean rootDirectoryExists) throws IOException {
+    private FileSystem(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
         this.clusterSize = clusterSize;
         this.numClusters = numClusters;
         this.randomAccessFile = file;
@@ -45,14 +45,14 @@ public class FileSystem {
         file.seek(0);
         file.writeShort(clusterSize);
         file.writeShort(numClusters);
-        return new FileSystem(clusterSize, numClusters, file, false);
+        return new FileSystem(clusterSize, numClusters, file);
     }
 
     public static FileSystem read(RandomAccessFile file) throws IOException {
         file.seek(0);
         int clusterSize = file.readUnsignedShort();
         int numClusters = file.readUnsignedShort();
-        return new FileSystem(clusterSize, numClusters, file, true);
+        return new FileSystem(clusterSize, numClusters, file);
     }
 
     void seekToCluster(Cluster cluster) throws IOException {
