@@ -61,14 +61,17 @@ public class FileSystem {
         return new Cluster(clusterNumber, this);
     }
 
-    Cluster allocateCluster() throws IOException {
+    Cluster allocateCluster(boolean clean) throws IOException {
         for(int i = 0; i < numClusters; i++) {
             Cluster cluster = getCluster(i);
             cluster.readAttributes();
             if(!cluster.isAttribute(Cluster.ATTRIBUTE_ALLOCATED)) {
                 cluster.attributes = Cluster.ATTRIBUTE_ALLOCATED;
                 cluster.nextCluster = 0;
-                cluster.writeHead();
+                if(clean)
+                    cluster.write(new byte[0]);
+                else
+                    cluster.writeHead();
                 return cluster;
             }
         }
@@ -113,15 +116,16 @@ public class FileSystem {
 
         data.attributeCluster = null;
         data.attributesDirty = true;
-        if(data.dataClustersDirty.isEmpty())
-            data.dataClustersDirty.put(0, new byte[0]);
+        data.lastClusterIndex = 0;
+        data.dataClustersDirty.clear();
     }
 
     public void writeData(AbstractData data) throws IOException {
         if(data.attributeCluster == null) {
             deleteData(data);
 
-            data.attributeCluster = allocateCluster();
+            data.attributesDirty = true;
+            data.attributeCluster = allocateCluster(false);
             data.attributeCluster.setAttribute(Cluster.ATTRIBUTE_FIRST, true);
             data.attributeCluster.setAttribute(data.getSetAttributes(), true);
         }
@@ -142,13 +146,20 @@ public class FileSystem {
 
             for(int clusterNumber = 0; clusterNumber < clusterCount; clusterNumber++) {
                 boolean forceWriteThisCluster = false;
-                boolean hasClusterData = data.dataClustersDirty.containsKey(clusterNumber);
+                byte[] clusterData = data.dataClustersDirty.containsKey(clusterNumber) ? data.dataClustersDirty.get(clusterNumber) : null;
 
                 if(currentCluster.nextCluster > 0) {
                     currentCluster = getCluster(currentCluster.nextCluster);
                     currentCluster.readHead();
+                    if(clusterNumber > data.lastClusterIndex) {
+                        deallocateCluster(currentCluster);
+                        break;
+                    }
                 } else {
-                    Cluster newCluster = allocateCluster();
+                    if(clusterNumber > data.lastClusterIndex)
+                        break;
+
+                    Cluster newCluster = allocateCluster(false);
                     currentCluster.readHead();
                     currentCluster.nextCluster = newCluster.location;
                     currentCluster.writeHead();
@@ -158,12 +169,10 @@ public class FileSystem {
                     forceWriteThisCluster = true;
                 }
 
-                if(forceWriteThisCluster || hasClusterData) {
-                    if(hasClusterData)
-                        currentCluster.write(data.dataClustersDirty.get(clusterNumber));
-                    else
-                        currentCluster.writeHead();
-                }
+                if(clusterData != null)
+                    currentCluster.write(data.dataClustersDirty.get(clusterNumber));
+                else if(forceWriteThisCluster)
+                    currentCluster.write(new byte[data.getClusterDataSize()]);
             }
         }
 

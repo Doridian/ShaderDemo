@@ -10,6 +10,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
     String name;
 
     protected TreeMap<Integer, byte[]> dataClustersDirty = new TreeMap<>();
+    protected int lastClusterIndex = 0;
     protected boolean attributesDirty;
 
     private int currentPos = 0;
@@ -35,7 +36,7 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
         this.attributesDirty = true;
     }
 
-    private int getClusterDataSize() {
+    int getClusterDataSize() {
         return fileSystem.clusterSize - Cluster.HEADER_SIZE;
     }
 
@@ -46,17 +47,39 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
             return fileSystem.getCluster(cluster).read();
     }
 
-    public void setLength(int len) {
-        //TODO
+    public void setLength(int len) throws IOException {
+        seek(len);
+        writeEOF();
+    }
+
+    public void writeEOF() throws IOException {
+        if(attributeCluster == null)
+            throw new IOException("Flush after creation");
+
+        int eofPos = currentPos - 1;
+        if(eofPos < 0)
+            eofPos = 0;
+        int lastCluster = getClusterFor(eofPos);
+        byte[] cluster = readCluster(lastCluster);
+        byte[] endCluster = new byte[eofPos % getClusterDataSize()];
+        if(cluster.length == endCluster.length)
+            endCluster = cluster;
+        else
+            System.arraycopy(cluster, 0, endCluster, 0, Math.min(endCluster.length, cluster.length));
+        dataClustersDirty.put(lastCluster, endCluster);
+        lastClusterIndex = lastCluster;
     }
 
     protected void writeAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
+        if(attributeCluster == null)
+            throw new IOException("Flush after creation");
+
         int startCluster = getClusterFor(filePos);
         int endCluster = getClusterFor(filePos + len - 1);
         int writtenData = 0;
 
         int oldPos = startCluster * getClusterDataSize();
-        byte[] oldData = new byte[(int)Math.ceil(((double)(len + (pos - oldPos))) / ((double)getClusterDataSize()))];
+        byte[] oldData = new byte[(int) Math.ceil(((double) (len + (pos - oldPos))) / ((double) getClusterDataSize()))];
         int oldLen = readAbsolute(oldPos, oldData, 0, oldData.length);
 
         for(int cluster = startCluster; cluster <= endCluster; cluster++) {
@@ -72,22 +95,37 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
             writtenData += curLen;
             dataClustersDirty.put(cluster, clusterData);
         }
+
+        if(lastClusterIndex < endCluster)
+            lastClusterIndex = endCluster;
+    }
+
+    public void delete() throws IOException {
+        fileSystem.deleteData(this);
     }
 
     protected int readAbsolute(int filePos, byte[] data, int pos, int len) throws IOException {
         if(attributeCluster == null)
-            return 0;
+            throw new IOException("Flush after creation");
+
         int startCluster = getClusterFor(filePos);
         int endCluster = getClusterFor(filePos + len);
+        if(endCluster > lastClusterIndex)
+            endCluster = lastClusterIndex;
+
         int readLen = 0;
         Cluster currentCluster = attributeCluster;
         for(int cluster = 0; cluster <= endCluster; cluster++) {
-            currentCluster.readHead();
-            if(currentCluster.nextCluster <= 0)
-                break;
-            currentCluster = fileSystem.getCluster(currentCluster.nextCluster);
-            if(cluster < startCluster)
-                continue;
+            if(currentCluster != null) {
+                currentCluster.readHead();
+                if (currentCluster.nextCluster <= 0)
+                    currentCluster = null;
+                else
+                    currentCluster = fileSystem.getCluster(currentCluster.nextCluster);
+                if(cluster < startCluster)
+                    continue;
+            }
+
             byte[] dataRead;
 
             int cOffset = (cluster == startCluster) ? filePos % getClusterDataSize() : 0;
@@ -95,10 +133,15 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable {
 
             if(dataClustersDirty.containsKey(cluster)) {
                 byte[] dirtyCluster = dataClustersDirty.get(cluster);
-                dataRead = new byte[Math.min(dirtyCluster.length, cMaxLen)];
+                if(cOffset > dirtyCluster.length)
+                    cOffset = dirtyCluster.length;
+                dataRead = new byte[Math.min(dirtyCluster.length - cOffset, cMaxLen)];
                 System.arraycopy(dirtyCluster, cOffset, dataRead, 0, dataRead.length);
-            } else
+            } else if(currentCluster != null) {
                 dataRead = currentCluster.read(cOffset, cMaxLen);
+            } else {
+                break;
+            }
             System.arraycopy(dataRead, 0, data, pos + readLen, dataRead.length);
             readLen += dataRead.length;
         }
