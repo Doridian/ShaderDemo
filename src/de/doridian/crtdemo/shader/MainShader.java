@@ -1,7 +1,6 @@
 package de.doridian.crtdemo.shader;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 
 public class MainShader extends ShaderProgram {

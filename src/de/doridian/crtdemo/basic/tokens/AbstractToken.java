@@ -1,6 +1,5 @@
 package de.doridian.crtdemo.basic.tokens;
 
-import com.sun.javafx.fxml.expression.Expression;
 import de.doridian.crtdemo.basic.BasicProgram;
 import de.doridian.crtdemo.basic.parameters.*;
 import de.doridian.crtdemo.basic.tokens.flow.GOTOToken;

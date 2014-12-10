@@ -1,6 +1,6 @@
 package de.doridian.crtdemo.simfs;
 
-import java.io.*;
+import java.io.IOException;
 
 public class Cluster {
     public final static short HEADER_SIZE = 1 + 2 + 2;

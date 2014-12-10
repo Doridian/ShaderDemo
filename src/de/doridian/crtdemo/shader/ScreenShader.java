@@ -1,10 +1,5 @@
 package de.doridian.crtdemo.shader;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL15;
-
-import java.nio.FloatBuffer;
-
 public class ScreenShader extends ShaderProgram {
 	public final int uniformResolution;
 	public final int uniformTexture;
