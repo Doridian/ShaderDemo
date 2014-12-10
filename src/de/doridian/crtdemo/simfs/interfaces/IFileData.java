@@ -8,4 +8,5 @@ public interface IFileData extends IAbstractData, DataInput, DataOutput {
     public void writeEOF() throws IOException;
     public void setLength(int length) throws IOException;
     public void seek(int pos) throws IOException;
+    public byte[] readFully() throws IOException;
 }

@@ -2,17 +2,33 @@ package de.doridian.crtdemo.basic;
 
 import de.doridian.crtdemo.Util;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
+import de.doridian.crtdemo.simfs.interfaces.IFileData;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.ArrayList;
 
 public class CodeParser {
     private final String[] lines;
     private final boolean debug;
 
     public CodeParser(String code, boolean debug) {
-        lines = code.split("[\r\n]+");
+        this.lines = code.split("[\r\n]+");
+        this.debug = debug;
+    }
+
+    public CodeParser(IFileData code, boolean debug) throws IOException {
+        this(new String(code.readFully(), "ASCII"), debug);
+    }
+
+    public CodeParser(InputStream code, boolean debug) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(code));
+
+        ArrayList<String> lineList = new ArrayList<>();
+        String line;
+        while((line = reader.readLine()) != null)
+            lineList.add(line.trim());
+
+        this.lines = lineList.toArray(new String[lineList.size()]);
         this.debug = debug;
     }
 
