@@ -51,7 +51,7 @@ public class CodeParser {
     public static void main(String[] args) {
         final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
-        BaseCompiledProgram compiledProgram = new CodeParser(Util.readFile("data/tmp/test.basic"), true).compile();
+        BaseCompiledProgram compiledProgram = new CodeParser(Util.readFile("data/test.basic"), true).compile();
 
         compiledProgram.$start(new BasicIO() {
             @Override
