@@ -233,7 +233,7 @@ public class CRTDemoMain extends OpenGLMain {
 				} catch (IOException e) {
 					e.printStackTrace();
 					io.print("ERROR\n");
-					System.exit(0);
+					halt();
 					return;
 				}
 
