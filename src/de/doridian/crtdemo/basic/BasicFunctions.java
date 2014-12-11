@@ -13,14 +13,30 @@ public class BasicFunctions {
         return str.substring(0, num);
     }
 
-    private final static Pattern LTRIM = Pattern.compile("^\\s+");
-    private final static Pattern RTRIM = Pattern.compile("\\s+$");
+    public static String RIGHT$(String str, int num) {
+        return str.substring(str.length() - num, str.length());
+    }
+
+    public static String CHR$(String str, int num) {
+        return "" + str.charAt(num);
+    }
+
+    public static int CHR(String str, int num) {
+        return str.charAt(num);
+    }
+
+    public static String SUB$(String str, int start, int end) {
+        return str.substring(start, end);
+    }
+
+    private final static Pattern _LTRIM = Pattern.compile("^\\s+");
+    private final static Pattern _RTRIM = Pattern.compile("\\s+$");
 
     public static String LTRIM$(String s) {
-        return LTRIM.matcher(s).replaceAll("");
+        return _LTRIM.matcher(s).replaceAll("");
     }
 
     public static String RTRIM$(String s) {
-        return RTRIM.matcher(s).replaceAll("");
+        return _RTRIM.matcher(s).replaceAll("");
     }
 }
