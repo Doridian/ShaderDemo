@@ -7,10 +7,8 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class FORToken extends AbstractToken {
     @Override
     public void insert() {
-        String variableName = "";
-        int from = 0;
-        int to = 0;
-        int step = 1;
+        String variableName;
+        int from, to, step = 1;
 
         AbstractParameter[] parameters = parametersSplitDetailed[0].subParams;
 
