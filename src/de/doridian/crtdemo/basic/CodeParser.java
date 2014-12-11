@@ -70,12 +70,14 @@ public class CodeParser {
             }
             token.insert();
         }
+
         BaseCompiledProgram compiledProgram = program.compile();
         if(compiledProgram == null)
             throw new AbstractToken.SyntaxException("COMPILE ERROR");
 
         compiledProgram.$fs = fs;
         compiledProgram.$debug = debug;
+        
         return compiledProgram;
     }
 }
