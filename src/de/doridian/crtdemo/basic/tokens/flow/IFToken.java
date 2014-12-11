@@ -15,6 +15,7 @@ public class IFToken extends AbstractToken {
 
         AbstractParameter[] parameters = parametersSplitDetailed[0].subParams;
 
+        outer_loop:
         for(int i = 0; i < parameters.length; i++) {
             AbstractParameter parameter = parameters[i];
             switch (stage) {
@@ -27,10 +28,10 @@ public class IFToken extends AbstractToken {
                     break;
                 case 1:
                     if(parameter.valueEquals("ELSE")) {
+                        stage = 2;
                         ifExpression = getAsAssignmentParameters(parameters, prevStage, i);
                         prevStage = i + 1;
-                        i = parametersSplitDetailed.length;
-                        stage = 2;
+                        break outer_loop;
                     }
                     break;
             }
