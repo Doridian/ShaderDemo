@@ -13,18 +13,22 @@ public class CodeParser {
     private final boolean debug;
     private final BasicFS fs;
 
-    public CodeParser(BasicFS fs, String code, boolean debug) throws IOException {
+    private CodeParser(String code, BasicFS fs, boolean debug) throws IOException {
         this.fs = fs;
         this.lines = code.split("[\r\n]+");
         this.debug = debug;
     }
 
     public CodeParser(String code, boolean debug) throws IOException {
-        this(new RealFSBasicFS(), code, debug);
+        this(code, new RealFSBasicFS(), debug);
+    }
+
+    public CodeParser(BasicFS fs, String fileName, boolean debug) throws IOException {
+        this(fs.getFileContents(fileName), fs, debug);
     }
 
     public CodeParser(IFileData code, boolean debug) throws IOException {
-        this(new SimFSBasicFS(code.getFileSystem()), new String(code.readFully(), "ASCII"), debug);
+        this(new String(code.readFully(), "ASCII"), new SimFSBasicFS(code.getFileSystem()), debug);
     }
 
     public CodeParser(InputStream code, boolean debug) throws IOException {
@@ -69,6 +73,9 @@ public class CodeParser {
             }
             token.insert();
         }
-        return program.compile();
+        BaseCompiledProgram compiledProgram = program.compile();
+        compiledProgram.$fs = fs;
+        compiledProgram.$debug = debug;
+        return compiledProgram;
     }
 }

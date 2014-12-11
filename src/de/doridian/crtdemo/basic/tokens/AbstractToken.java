@@ -2,6 +2,7 @@ package de.doridian.crtdemo.basic.tokens;
 
 import de.doridian.crtdemo.basic.BasicProgram;
 import de.doridian.crtdemo.basic.parameters.*;
+import de.doridian.crtdemo.basic.tokens.flow.EXECToken;
 import de.doridian.crtdemo.basic.tokens.flow.GOTOToken;
 import de.doridian.crtdemo.basic.tokens.flow.IFToken;
 import de.doridian.crtdemo.basic.tokens.flow.do_loop_loop.DOToken;
@@ -77,6 +78,7 @@ public abstract class AbstractToken {
         addToken(ENDToken.class);
         addToken(LETToken.class);
         addToken(SLEEPToken.class);
+        addToken(EXECToken.class);
     }
 
     private static void addToken(Class<? extends AbstractToken> tokenClass) {

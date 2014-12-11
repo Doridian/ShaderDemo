@@ -150,7 +150,7 @@ public class BasicProgram {
         if(entryPoint < 0)
             entryPoint = line;
         lineNumbers.add(line);
-        functionCode += "\tpublic void $LINE_" + (""+line).replace('.', '_') + "() {\n" + code + "\n\t}\n";
+        functionCode += "\tpublic void $LINE_" + (""+line).replace('.', '_') + "() throws Exception {\n" + code + "\n\t}\n";
     }
 
     public String parseNoopLines() {

@@ -15,6 +15,9 @@ public abstract class BaseCompiledProgram {
     protected final HashMap<Float, Method> $lineMethods;
 
     protected BasicIO $io;
+    BasicFS $fs;
+
+    boolean $debug;
 
     String $sourceCode;
 
