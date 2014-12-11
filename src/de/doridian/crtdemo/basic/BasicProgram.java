@@ -32,7 +32,8 @@ public class BasicProgram {
 
     public String getVarType(String varName) {
         int dollarIdx = varName.indexOf('$');
-        if(dollarIdx >= 0 && (varName.length() <= 1 || dollarIdx < varName.length() - 1))
+
+        if(dollarIdx == 0)
             throw new AbstractToken.SyntaxException("VARIABLE NAMES MAY NOT START WITH $");
 
         if(dollarIdx > 0)
