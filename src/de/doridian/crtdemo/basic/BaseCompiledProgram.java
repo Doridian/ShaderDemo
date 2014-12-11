@@ -26,10 +26,10 @@ public abstract class BaseCompiledProgram {
     }
 
     public static class LoopLines {
-        public final int start;
-        public final int end;
+        public final float start;
+        public final float end;
 
-        public LoopLines(int start, int end) {
+        public LoopLines(float start, float end) {
             this.start = start;
             this.end = end;
         }
@@ -86,7 +86,7 @@ public abstract class BaseCompiledProgram {
         }
     }
 
-    protected void $addLoop(int start, int end) {
+    protected void $addLoop(float start, float end) {
         $loopQueue.add(new LoopLines(start, end));
     }
 

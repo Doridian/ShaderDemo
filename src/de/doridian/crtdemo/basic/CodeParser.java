@@ -2,27 +2,52 @@ package de.doridian.crtdemo.basic;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class CodeParser {
     private final String[] lines;
     private final boolean debug;
     private final BasicFS fs;
 
-    private CodeParser(String code, BasicFS fs, boolean debug) throws IOException {
+    public CodeParser(BasicFS fs, String fileName, boolean debug) throws IOException {
         this.fs = fs;
-        this.lines = code.split("[\r\n]+");
         this.debug = debug;
+
+        ArrayList<String> codeLines = addPreprocessedFile(fileName);
+        this.lines = codeLines.toArray(new String[codeLines.size()]);
     }
 
-    public CodeParser(BasicFS fs, String fileName, boolean debug) throws IOException {
-        this(fs.getFileContents(fileName), fs, debug);
+    private ArrayList<String> addPreprocessedFile(String fileName) throws IOException {
+        ArrayList<String> codeLines = new ArrayList<>();
+
+        for(String line : fs.getFileContents(fileName).split("[\r\n]+")) {
+            line = line.trim();
+            if(line.isEmpty())
+                continue;
+
+            if(line.charAt(0) != '#') {
+                codeLines.add(line);
+                continue;
+            }
+
+            String[] preprocessorArgs = line.substring(1).split(" +");
+            switch (preprocessorArgs[0].toLowerCase()) {
+                case "include":
+                    codeLines.addAll(addPreprocessedFile(preprocessorArgs[1]));
+                    break;
+                default:
+                    throw new RuntimeException("Invalid preprocessor directive");
+            }
+        }
+
+        return codeLines;
     }
 
     public BaseCompiledProgram compile() {
         BasicProgram program = new BasicProgram(debug);
         for(int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            if(line.charAt(0) == '#' || line.isEmpty())
+            if(line.charAt(0) == '\'' || line.isEmpty())
                 continue;
             AbstractToken token = AbstractToken.parseLine(program, line);
             Class<? extends AbstractToken> endingToken = token.getEndingToken();
