@@ -42,18 +42,14 @@ public class BasicProgram {
 
     }
 
-    public void addVariable(String varName, int arraySize) {
+    public void addVariable(String varName, boolean isArray) {
         if(!definedVariables.add(varName))
             return;
         String varType = getVarType(varName);
-        variableCode += "\tpublic " + varType + "[] " + varName + " = new " + varType + "[" + arraySize + "];\n";
-    }
-
-    public void addVariable(String varName) {
-        if(!definedVariables.add(varName))
-            return;
-        String varType = getVarType(varName);
-        variableCode += "\tpublic " + varType + " " + varName + ";\n";
+        if(isArray)
+            variableCode += "\tpublic " + varType + "[] " + varName + " = null;\n";
+        else
+            variableCode += "\tpublic " + varType + " " + varName + ";\n";
     }
 
     private static int COMPILE_CTR = 0;

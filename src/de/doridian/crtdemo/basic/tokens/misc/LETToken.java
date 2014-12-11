@@ -17,14 +17,14 @@ public class LETToken extends AbstractToken {
             int openBrPos = varName.indexOf('[');
             int arraySize = Integer.parseInt(varName.substring(openBrPos + 1, varName.length() - 1));
             varName = varName.substring(0, openBrPos);
-            program.addVariable(varName, arraySize);
+            program.addVariable(varName, true);
 
             return prefix + varName + " = new " + program.getVarType(varName) + "[" + arraySize + "];";
         } else {
             if(!parameters[1].valueEquals("="))
                 throw new SyntaxException();
             if(!isArray)
-                program.addVariable(varName);
+                program.addVariable(varName, false);
         }
 
         return prefix + getAsAssignmentParameters(0) + ";";
