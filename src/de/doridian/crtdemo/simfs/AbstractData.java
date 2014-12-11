@@ -3,6 +3,7 @@ package de.doridian.crtdemo.simfs;
 import de.doridian.crtdemo.simfs.data.DirectoryData;
 import de.doridian.crtdemo.simfs.interfaces.IAbstractData;
 import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
+import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -66,6 +67,11 @@ public class AbstractData extends SimpleDataInputOutput implements Closeable, IA
     @Override
     public IDirectoryData getParent() throws IOException {
         return parent;
+    }
+
+    @Override
+    public IFileSystem getFileSystem() {
+        return fileSystem;
     }
 
     public void setLength(int len) throws IOException {

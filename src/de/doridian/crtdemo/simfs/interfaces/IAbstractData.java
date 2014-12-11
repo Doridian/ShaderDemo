@@ -14,4 +14,5 @@ public interface IAbstractData extends Closeable {
     public String getAbsolutePath();
 
     public IDirectoryData getParent() throws IOException;
+    public IFileSystem getFileSystem();
 }

@@ -1,6 +1,4 @@
 package de.doridian.crtdemo.basic;
-
-import de.doridian.crtdemo.Util;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
 import de.doridian.crtdemo.simfs.interfaces.IFileData;
 
@@ -13,14 +11,20 @@ import java.util.ArrayList;
 public class CodeParser {
     private final String[] lines;
     private final boolean debug;
+    private final BasicFS fs;
 
-    public CodeParser(String code, boolean debug) {
+    public CodeParser(BasicFS fs, String code, boolean debug) throws IOException {
+        this.fs = fs;
         this.lines = code.split("[\r\n]+");
         this.debug = debug;
     }
 
+    public CodeParser(String code, boolean debug) throws IOException {
+        this(new RealFSBasicFS(), code, debug);
+    }
+
     public CodeParser(IFileData code, boolean debug) throws IOException {
-        this(new String(code.readFully(), "ASCII"), debug);
+        this(new SimFSBasicFS(code.getFileSystem()), new String(code.readFully(), "ASCII"), debug);
     }
 
     public CodeParser(InputStream code, boolean debug) throws IOException {
@@ -33,6 +37,7 @@ public class CodeParser {
 
         this.lines = lineList.toArray(new String[lineList.size()]);
         this.debug = debug;
+        this.fs = new RealFSBasicFS();
     }
 
     public BaseCompiledProgram compile() {
@@ -65,53 +70,5 @@ public class CodeParser {
             token.insert();
         }
         return program.compile();
-    }
-
-    public static void main(String[] args) {
-        final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-
-        BaseCompiledProgram compiledProgram = new CodeParser(Util.readFile("data/test.basic"), true).compile();
-
-        compiledProgram.$start(new BasicIO() {
-            @Override
-            public String readLine() {
-                try {
-                    return inputReader.readLine().trim();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public void clearLine(int line) {
-
-            }
-
-            @Override
-            public void clearScreen() {
-
-            }
-
-            @Override
-            public int getLines() {
-                return 9999;
-            }
-
-            @Override
-            public int getColumns() {
-                return 256;
-            }
-
-            @Override
-            public void print(Object obj) {
-                System.out.print(obj);
-                System.out.flush();
-            }
-
-            @Override
-            public void setCursor(int x, int y) {
-
-            }
-        });
     }
 }
