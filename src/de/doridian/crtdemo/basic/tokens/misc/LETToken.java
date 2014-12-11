@@ -13,13 +13,25 @@ public class LETToken extends AbstractToken {
 
         boolean isArray = varName.charAt(varName.length() - 1) == ']';
 
-        if(parameters.length < 2) { //ARRAY
-            int openBrPos = varName.indexOf('[');
-            int arraySize = Integer.parseInt(varName.substring(openBrPos + 1, varName.length() - 1));
-            varName = varName.substring(0, openBrPos);
-            program.addVariable(varName, true);
+        if(parameters.length < 2) {
+            if(isArray) {
+                int openBrPos = varName.indexOf('[');
+                int arraySize = Integer.parseInt(varName.substring(openBrPos + 1, varName.length() - 1));
+                varName = varName.substring(0, openBrPos);
+                program.addVariable(varName, true);
 
-            return prefix + varName + " = new " + program.getVarType(varName) + "[" + arraySize + "];";
+                return prefix + varName + " = new " + program.getVarType(varName) + "[" + arraySize + "];";
+            } else {
+                String varType = program.getVarType(varName);
+                switch (varType) {
+                    case "String":
+                        return prefix + varName + " = \"\";";
+                    case "int":
+                        return prefix + varName + " = 0;";
+                    default:
+                        throw new SyntaxException("INVALID VAR TYPE");
+                }
+            }
         } else {
             if(!parameters[1].valueEquals("="))
                 throw new SyntaxException();
@@ -27,6 +39,6 @@ public class LETToken extends AbstractToken {
                 program.addVariable(varName, false);
         }
 
-        return prefix + getAsAssignmentParameters(0) + ";";
+        return prefix + varName + " = " + getAsAssignmentParameters(parameters, 2, parameters.length) + ";";
     }
 }
