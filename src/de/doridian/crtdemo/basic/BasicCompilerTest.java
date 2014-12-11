@@ -1,7 +1,5 @@
 package de.doridian.crtdemo.basic;
 
-import de.doridian.crtdemo.Util;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,7 +8,7 @@ public class BasicCompilerTest {
     public static void main(String[] args) throws Exception {
         final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
-        BaseCompiledProgram compiledProgram = new CodeParser(Util.readFile("data/test.basic"), true).compile();
+        BaseCompiledProgram compiledProgram = new CodeParser(new RealFSBasicFS(), "test.basic", true).compile();
 
         compiledProgram.$start(new BasicIO() {
             @Override

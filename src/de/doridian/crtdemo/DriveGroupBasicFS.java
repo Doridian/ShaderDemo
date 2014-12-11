@@ -1,21 +1,20 @@
-package de.doridian.crtdemo.basic;
+package de.doridian.crtdemo;
 
+import de.doridian.crtdemo.basic.BasicFS;
 import de.doridian.crtdemo.simfs.interfaces.IFileData;
-import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 
 import java.io.IOException;
 
-public class SimFSBasicFS implements BasicFS {
-    private final IFileSystem fs;
+public class DriveGroupBasicFS implements BasicFS {
+    private final DriveGroup fs;
 
-    public SimFSBasicFS(IFileSystem fs) {
+    public DriveGroupBasicFS(DriveGroup fs) {
         this.fs = fs;
     }
 
     @Override
     public String getFileContents(String fileName) throws IOException {
         IFileData file = (IFileData)fs.getFile(fileName);
-        fs.setCWD(file.getParent());
         return new String(file.readFully(), "ASCII");
     }
 }

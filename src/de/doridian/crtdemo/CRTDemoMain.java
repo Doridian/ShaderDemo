@@ -282,7 +282,7 @@ public class CRTDemoMain extends OpenGLMain {
 					BaseCompiledProgram program;
 
 					try {
-						CodeParser parser = new CodeParser(bootFile, true);
+						CodeParser parser = new CodeParser(new DriveGroupBasicFS(driveGroup), bootFileName, true);
 						program = parser.compile();
 					} catch (Exception e) {
 						io.print("LOAD ERROR. Trying next.\n");

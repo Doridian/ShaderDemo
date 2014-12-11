@@ -1,12 +1,7 @@
 package de.doridian.crtdemo.basic;
 import de.doridian.crtdemo.basic.tokens.AbstractToken;
-import de.doridian.crtdemo.simfs.interfaces.IFileData;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 public class CodeParser {
     private final String[] lines;
@@ -19,29 +14,8 @@ public class CodeParser {
         this.debug = debug;
     }
 
-    public CodeParser(String code, boolean debug) throws IOException {
-        this(code, new RealFSBasicFS(), debug);
-    }
-
     public CodeParser(BasicFS fs, String fileName, boolean debug) throws IOException {
         this(fs.getFileContents(fileName), fs, debug);
-    }
-
-    public CodeParser(IFileData code, boolean debug) throws IOException {
-        this(new String(code.readFully(), "ASCII"), new SimFSBasicFS(code.getFileSystem()), debug);
-    }
-
-    public CodeParser(InputStream code, boolean debug) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(code));
-
-        ArrayList<String> lineList = new ArrayList<>();
-        String line;
-        while((line = reader.readLine()) != null)
-            lineList.add(line.trim());
-
-        this.lines = lineList.toArray(new String[lineList.size()]);
-        this.debug = debug;
-        this.fs = new RealFSBasicFS();
     }
 
     public BaseCompiledProgram compile() {
