@@ -30,20 +30,29 @@ public class BasicProgram {
         this.debug = debug;
     }
 
-    public void addVariable(String varName) {
+    public String getVarType(String varName) {
         int dollarIdx = varName.indexOf('$');
         if(dollarIdx >= 0 && (varName.length() <= 1 || dollarIdx < varName.length() - 1))
-            throw new AbstractToken.SyntaxException("VARIABLE NAMES MAY NOT CONTAIN $");
+            throw new AbstractToken.SyntaxException("VARIABLE NAMES MAY NOT START WITH $");
 
+        if(dollarIdx > 0)
+            return "String";
+        else
+            return "int";
+
+    }
+
+    public void addVariable(String varName, int arraySize) {
         if(!definedVariables.add(varName))
             return;
+        String varType = getVarType(varName);
+        variableCode += "\tpublic " + varType + "[] " + varName + " = new " + varType + "[" + arraySize + "];\n";
+    }
 
-        String varType;
-        if(dollarIdx > 0)
-            varType = "String";
-        else
-            varType = "int";
-
+    public void addVariable(String varName) {
+        if(!definedVariables.add(varName))
+            return;
+        String varType = getVarType(varName);
         variableCode += "\tpublic " + varType + " " + varName + ";\n";
     }
 

@@ -22,7 +22,7 @@ public class CodeParser {
 
         for(String line : fs.getFileContents(fileName).split("[\r\n]+")) {
             line = line.trim();
-            if(line.isEmpty())
+            if(line.isEmpty() || line.charAt(0) == '\'')
                 continue;
 
             if(line.charAt(0) != '#') {
@@ -47,8 +47,6 @@ public class CodeParser {
         BasicProgram program = new BasicProgram(debug);
         for(int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            if(line.charAt(0) == '\'' || line.isEmpty())
-                continue;
             AbstractToken token = AbstractToken.parseLine(program, line);
             Class<? extends AbstractToken> endingToken = token.getEndingToken();
             if(endingToken != null) {

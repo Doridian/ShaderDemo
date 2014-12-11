@@ -39,4 +39,12 @@ public class BasicFunctions {
     public static String RTRIM$(String s) {
         return _RTRIM.matcher(s).replaceAll("");
     }
+
+    public static int ARRAYLEN(Object[] array) {
+        return array.length;
+    }
+
+    public static int ARRAYLEN(int[] array) {
+        return array.length;
+    }
 }

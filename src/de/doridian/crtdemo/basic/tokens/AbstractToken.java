@@ -178,7 +178,7 @@ public abstract class AbstractToken {
         ArrayList<AbstractParameter> parsedParametersCurrentGroup = new ArrayList<>();
         ArrayList<GroupedParameter> parsedParameters = new ArrayList<>();
 
-        boolean inQuotes = false, inBackslash = false, isNumeric = true; int openBrackets = 0;
+        boolean inQuotes = false, inBackslash = false; int openBrackets = 0;
         StringBuilder preBracket = new StringBuilder();
         StringBuilder tmpStr = new StringBuilder();
         for (int pos = 0; pos < parameters.length(); pos++) {
@@ -193,7 +193,6 @@ public abstract class AbstractToken {
                     inBackslash = true;
                 } else if (c == '"') {
                     inQuotes = false;
-                    isNumeric = true;
                     parsedParametersCurrentGroup.add(new StringLiteralParameter(tmpStr.toString()));
                     tmpStr.setLength(0);
                 } else {
@@ -205,7 +204,6 @@ public abstract class AbstractToken {
                         preBracket = tmpStr;
                         tmpStr = new StringBuilder();
                     }
-                    isNumeric = false;
                 } else if(c == ')') {
                     if(openBrackets <= 0)
                         throw new SyntaxException("CANNOT CLOSE NON-OPEN BRACKET");
@@ -213,7 +211,6 @@ public abstract class AbstractToken {
                         parsedParametersCurrentGroup.add(new BracketedParameter(preBracket.toString(), tmpStr.toString()));
                         tmpStr.setLength(0);
                         preBracket.setLength(0);
-                        isNumeric = true;
                     }
                 } else if (c == '"' && openBrackets == 0) {
                     if (tmpStr.length() > 0)
@@ -221,12 +218,13 @@ public abstract class AbstractToken {
                     inQuotes = true;
                 } else if ((c == ' ' || (c == ',' && !noGroups)) && openBrackets == 0) {
                     if (tmpStr.length() >= 1) {
-                        if (isNumeric)
-                            parsedParametersCurrentGroup.add(new NumberParameter(Integer.parseInt(tmpStr.toString())));
-                        else
+                        String realTmpStr = tmpStr.toString();
+                        try {
+                            parsedParametersCurrentGroup.add(new NumberParameter(Integer.parseInt(realTmpStr)));
+                        } catch (Exception e) {
                             parsedParametersCurrentGroup.add(new RawStringParameter(tmpStr.toString()));
+                        }
 
-                        isNumeric = true;
                         tmpStr.setLength(0);
                     }
 
@@ -236,8 +234,6 @@ public abstract class AbstractToken {
                     }
                 } else {
                     tmpStr.append(c);
-                    if ((c < '0' || c > '9') && c != '-')
-                        isNumeric = false;
                 }
             }
         }
@@ -246,10 +242,12 @@ public abstract class AbstractToken {
             throw new SyntaxException("IN PARAMETER STRING");
 
         if(tmpStr.length() > 0) {
-            if (isNumeric)
-                parsedParametersCurrentGroup.add(new NumberParameter(Integer.parseInt(tmpStr.toString())));
-            else
+            String realTmpStr = tmpStr.toString();
+            try {
+                parsedParametersCurrentGroup.add(new NumberParameter(Integer.parseInt(realTmpStr)));
+            } catch (Exception e) {
                 parsedParametersCurrentGroup.add(new RawStringParameter(tmpStr.toString()));
+            }
         }
 
         if(parsedParametersCurrentGroup.size() > 0) {

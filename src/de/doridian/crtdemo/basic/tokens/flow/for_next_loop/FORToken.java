@@ -63,9 +63,9 @@ public class FORToken extends AbstractToken {
             comparator = "<=";
 
         program.addVariable(variableName);
-        addLine("\t\t" + variableName + " = " + initialExpression + ";");
+        addLine("\t\t" + variableName + " = " + initialExpression + " - (" + step + ");");
         float lineCode = line + 0.1f;
-        program.addLine(lineCode, "\t\tif(" + variableName + " " + comparator + " " + toExpression + ") {\n\t\t\t$gotoAfter(" + endingToken.line + ");\n\t\t\treturn;\n\t\t}\n\t\t$addLoop(" + lineCode + "f, " + endingToken.line + ");\n\t\t" + variableName + " += " + step + ";");
+        program.addLine(lineCode, "\t\tif(" + variableName + " " + comparator + " " + toExpression + ") {\n\t\t\t$gotoAfter(" + endingToken.line + ");\n\t\t\treturn;\n\t\t}\n\t\t$addLoop(" + lineCode + "f, " + endingToken.line + ");\n\t\t" + variableName + " += (" + step + ");");
     }
 
     public Class<? extends AbstractToken> getEndingToken() {
