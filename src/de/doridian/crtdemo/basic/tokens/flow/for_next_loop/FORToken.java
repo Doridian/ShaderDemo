@@ -7,21 +7,52 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class FORToken extends AbstractToken {
     @Override
     public void insert() {
-        String variableName;
-        int from, to, step = 1;
+        String variableName = "";
+        String initialExpression = "";
+        String toExpression = "";
+
+        int step = 1;
+        int stage = 0;
+        int prevStage = 2;
 
         AbstractParameter[] parameters = parametersSplitDetailed[0].subParams;
 
-        if(!parameters[1].valueEquals("=") || !parameters[3].valueEquals("TO"))
+        variableName = (String)parameters[0].getValue();
+
+        if(!parameters[1].valueEquals("="))
             throw new SyntaxException();
 
-        variableName = (String)parameters[0].getValue();
-        from = (Integer)parameters[2].getValue();
-        to = (Integer)parameters[4].getValue();
-        if(parameters.length > 5) {
-            if(!parameters[5].valueEquals("STEP"))
-                throw new SyntaxException();
-            step = (Integer)parameters[6].getValue();
+        outer_loop:
+        for(int i = 2; i < parameters.length; i++) {
+            AbstractParameter parameter = parameters[i];
+            switch (stage) {
+                case 0:
+                    if (parameter.valueEquals("TO")) {
+                        stage = 1;
+                        initialExpression = getAsAssignmentParameters(parameters, prevStage, i);
+                        prevStage = i + 1;
+                    }
+                    break;
+                case 1:
+                    if(parameter.valueEquals("STEP")) {
+                        stage = 2;
+                        toExpression = getAsAssignmentParameters(parameters, prevStage, i);
+                        prevStage = i + 1;
+                        break outer_loop;
+                    }
+                    break;
+            }
+        }
+
+        switch (stage) {
+            case 0:
+                throw new SyntaxException("INVALID IF CONSTRUCT");
+            case 1:
+                toExpression = getAsAssignmentParameters(parameters, prevStage, parameters.length);
+                break;
+            case 2:
+                step = (Integer)parameters[prevStage].getValue();
+                break;
         }
 
         if(step == 0)
@@ -32,9 +63,9 @@ public class FORToken extends AbstractToken {
             comparator = "<=";
 
         program.addVariable(variableName);
-        addLine("\t\t" + variableName + " = " + from + ";");
+        addLine("\t\t" + variableName + " = " + initialExpression + ";");
         float lineCode = line + 0.1f;
-        program.addLine(lineCode, "\t\tif(" + variableName + " " + comparator + " " + to + ") {\n\t\t\t$gotoAfter(" + endingToken.line + ");\n\t\t\treturn;\n\t\t}\n\t\t$addLoop(" + lineCode + "f, " + endingToken.line + ");\n\t\t" + variableName + " += " + step + ";");
+        program.addLine(lineCode, "\t\tif(" + variableName + " " + comparator + " " + toExpression + ") {\n\t\t\t$gotoAfter(" + endingToken.line + ");\n\t\t\treturn;\n\t\t}\n\t\t$addLoop(" + lineCode + "f, " + endingToken.line + ");\n\t\t" + variableName + " += " + step + ";");
     }
 
     public Class<? extends AbstractToken> getEndingToken() {
