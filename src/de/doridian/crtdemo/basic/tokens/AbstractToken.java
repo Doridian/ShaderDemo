@@ -2,9 +2,7 @@ package de.doridian.crtdemo.basic.tokens;
 
 import de.doridian.crtdemo.basic.BasicProgram;
 import de.doridian.crtdemo.basic.parameters.*;
-import de.doridian.crtdemo.basic.tokens.flow.EXECToken;
-import de.doridian.crtdemo.basic.tokens.flow.GOTOToken;
-import de.doridian.crtdemo.basic.tokens.flow.IFToken;
+import de.doridian.crtdemo.basic.tokens.flow.*;
 import de.doridian.crtdemo.basic.tokens.flow.do_loop_loop.DOToken;
 import de.doridian.crtdemo.basic.tokens.flow.do_loop_loop.LOOPToken;
 import de.doridian.crtdemo.basic.tokens.flow.for_next_loop.FORToken;
@@ -56,6 +54,9 @@ public abstract class AbstractToken {
         // Flow control
         addToken(GOSUBToken.class);
         addToken(RETURNToken.class);
+
+        addToken(BREAKToken.class);
+        addToken(CONTINUEToken.class);
 
         addToken(GOTOToken.class);
 
