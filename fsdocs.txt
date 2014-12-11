@@ -1,0 +1,16 @@
+FileSystem:
+16-bit Cluster Size
+16-bit Number of clusters
+
+Each cluster:
+8-bit Attributes [Allocated, (Directory, ReadOnly)] Brackets = only first
+16-bit Next Cluster [0 if none]
+16-bit Used DATA in this cluster (Does NOT include header!!!)
+
+Specific for each type:
+	First Any:
+		x byte Name
+	Directory:
+		x * 16-bit First Cluster of Child File
+	File:
+		Contents
