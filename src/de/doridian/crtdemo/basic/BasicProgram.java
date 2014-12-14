@@ -147,15 +147,22 @@ public class BasicProgram {
         return null;
     }
 
+    private void addLineNumber(float line) {
+        if(!lineNumbers.add(line))
+            throw new AbstractToken.SyntaxException("Line " + Math.floor(line) + " used twice");
+        if(lineNumbers.higher(line) != null)
+            throw new AbstractToken.SyntaxException("Line " + Math.floor(line) + " appears after higher numbered line");
+    }
+
     public void addNoopLine(float line) {
-        lineNumbers.add(line);
+        addLineNumber(line);
         noopLines.add(line);
     }
 
     public void addLine(float line, String code) {
         if(entryPoint < 0)
             entryPoint = line;
-        lineNumbers.add(line);
+        addLineNumber(line);
         functionCode += "\tpublic void $LINE_" + (""+line).replace('.', '_') + "() throws Exception {\n" + code + "\n\t}\n";
     }
 
