@@ -73,13 +73,17 @@ public class CRTDemoMain extends OpenGLMain {
 		stringCursorOff = BasicFunctions.RTRIM$(sbCursorOff.toString());
 	}
 
-	public static void writeChar(char c) {
+	public static void writeChar(char c, boolean invert) {
 		scrollUp();
-		screenInvert[posY][posX] = (c | 0x80) == 0x80;
-		screenCursorOff[posY][posX] = (char)(c & 0x7F);
-		screenCursorOn[posY][posX] = (char)(c & 0x7F);
+		screenInvert[posY][posX] = invert;
+		screenCursorOff[posY][posX] = c;
+		screenCursorOn[posY][posX] = c;
 		refreshInvert();
 		refreshCursor();
+	}
+
+	public static void writeChar(char c) {
+		writeChar((char)(c & 0x7F), (c | 0x80) == 0x80);
 	}
 
 	public static void scrollUp() {
