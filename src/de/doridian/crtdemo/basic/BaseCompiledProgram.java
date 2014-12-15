@@ -62,11 +62,6 @@ public abstract class BaseCompiledProgram {
         }
     }
 
-    protected void $addNoopLine(float line) {
-        $lineNumbers.add(line);
-        $lineMethods.put(line, null);
-    }
-
     public synchronized void $start(BasicIO io) {
         this.$io = io;
         float line = 0;
@@ -96,11 +91,11 @@ public abstract class BaseCompiledProgram {
     }
 
     protected void $goto(float line) {
-        $nextLinePointer = line;
+        $nextLinePointer = $lineNumbers.ceiling(line);
     }
 
     protected void $gotoAfter(float line) {
-        $goto($lineNumbers.higher(line));
+        $nextLinePointer = $lineNumbers.higher(line);
     }
 
     private Float $runNextLine() throws Exception {
