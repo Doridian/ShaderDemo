@@ -75,9 +75,9 @@ public class CRTDemoMain extends OpenGLMain {
 
 	public static void writeChar(char c) {
 		scrollUp();
-		screenCursorOff[posY][posX] = c;
-		screenCursorOn[posY][posX] = c;
-		screenInvert[posY][posX] = c == 'o';
+		screenInvert[posY][posX] = (c | 0x80) == 0x80;
+		screenCursorOff[posY][posX] = (char)(c & 0x7F);
+		screenCursorOn[posY][posX] = (char)(c & 0x7F);
 		refreshInvert();
 		refreshCursor();
 	}
