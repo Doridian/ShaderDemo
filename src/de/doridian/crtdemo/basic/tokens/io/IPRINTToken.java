@@ -7,10 +7,6 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class IPRINTToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        String ret = "";
-        for(GroupedParameter param : parametersSplitDetailed) {
-            ret += prefix + "$io.print(" + param.getAsParameter() + ", true);\n";
-        }
-        return ret.substring(0, ret.length() - 1);
+        return PRINTToken.getPrintParameters(prefix, parametersSplitDetailed, true);
     }
 }
