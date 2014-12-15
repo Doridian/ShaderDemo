@@ -179,7 +179,12 @@ public class CRTDemoMain extends OpenGLMain {
 		}
 
 		@Override
-		public synchronized void print(Object obj) {
+		public void print(Object obj) {
+			print(obj, false);
+		}
+
+		@Override
+		public synchronized void print(Object obj, boolean invert) {
 			for(char c : obj.toString().toCharArray()) {
 				if(c == '\r') {
 					posX = 0;
@@ -189,7 +194,7 @@ public class CRTDemoMain extends OpenGLMain {
 					nextLine();
 					continue;
 				}
-				writeChar(c);
+				writeChar(c, invert);
 				moveForward();
 			}
 		}

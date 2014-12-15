@@ -10,6 +10,7 @@ public interface BasicIO {
     public int getColumns();
 
     public void print(Object obj);
+    public void print(Object obj, boolean invert);
 
     public void setCursor(int column, int line);
 }

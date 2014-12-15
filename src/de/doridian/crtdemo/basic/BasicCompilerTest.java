@@ -41,6 +41,11 @@ public class BasicCompilerTest {
             }
 
             @Override
+            public void print(Object obj, boolean invert) {
+                print(obj);
+            }
+
+            @Override
             public void print(Object obj) {
                 System.out.print(obj);
                 System.out.flush();
