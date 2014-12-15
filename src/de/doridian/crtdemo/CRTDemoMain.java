@@ -206,19 +206,13 @@ public class CRTDemoMain extends OpenGLMain {
 			}
 
 			public void run() {
-				//
-				try {
-					RandomAccessFile ranAF = new RandomAccessFile("data/filesystem/C", "rw");
-					ranAF.setLength(0);
-					IFileSystem fs = FileSystem.create(512, 32000, ranAF);
-					IFileData file = fs.getRootDirectory().createFile("boot.basic");
-					file.write(Util.readFile("data/test.basic").getBytes("ASCII"));
-					ranAF.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.exit(0);
-				}
-				//
+				FSTransferAgent.initFS();
+				FSTransferAgent.transferFile("boot.basic");
+				FSTransferAgent.transferFile("test_1.basic");
+				FSTransferAgent.transferFile("test_2.basic");
+				FSTransferAgent.transferFile("test_3.basic");
+				FSTransferAgent.transferFile("test_4.basic");
+				FSTransferAgent.transferFile("test_5.basic");
 
 				io.print("foxBIOS v0.1b\nCore booting");
 				printLoad('.', 3, 3000, " OK\n");
@@ -286,6 +280,7 @@ public class CRTDemoMain extends OpenGLMain {
 						program = parser.compile();
 					} catch (Exception e) {
 						io.print("LOAD ERROR. Trying next.\n");
+						e.printStackTrace();
 						continue;
 					}
 
