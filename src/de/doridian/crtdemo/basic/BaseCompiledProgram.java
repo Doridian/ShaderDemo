@@ -1,5 +1,6 @@
 package de.doridian.crtdemo.basic;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -84,6 +85,10 @@ public abstract class BaseCompiledProgram {
             e.printStackTrace();
             io.print("\nERROR ON LINE " + line + ": " + e.getMessage() + "\n");
         }
+    }
+
+    protected void $execSubFile(String file) throws IOException {
+        new CodeParser($fs, file, $debug).compile().$start($io);
     }
 
     protected void $addLoop(float start, float end) {
