@@ -6,6 +6,6 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class ENDToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        return prefix + "$nextLinePointer = null;\n" + prefix + "$cleanExit = true;";
+        return prefix + "$goto(null);\n" + prefix + "$cleanExit = true;";
     }
 }

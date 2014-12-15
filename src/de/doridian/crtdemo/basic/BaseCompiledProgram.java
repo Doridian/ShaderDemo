@@ -7,7 +7,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class BaseCompiledProgram {
-    protected Float $nextLinePointer = null;
+    private Float $nextLinePointer = null;
     protected boolean $cleanExit = false;
 
     protected final float $entryPoint;
@@ -88,6 +88,13 @@ public abstract class BaseCompiledProgram {
 
     protected void $addLoop(float start, float end) {
         $loopQueue.add(new LoopLines(start, end));
+    }
+
+    protected void $goto(Float line) {
+        if(line == null)
+            $nextLinePointer = null;
+        else
+            $goto((float)line);
     }
 
     protected void $goto(float line) {
