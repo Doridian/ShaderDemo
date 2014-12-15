@@ -48,6 +48,7 @@ public abstract class AbstractToken {
         addToken(INPUTToken.class);
         addToken(PRINTToken.class);
         addToken(IPRINTToken.class);
+        addToken(GETCHARToken.class);
         addToken(ATToken.class);
         addToken(CLLToken.class);
         addToken(CLSToken.class);
