@@ -11,13 +11,14 @@ import de.doridian.crtdemo.simfs.FileSystem;
 import de.doridian.crtdemo.simfs.interfaces.IFileData;
 import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -36,18 +37,26 @@ public class CRTDemoMain extends OpenGLMain {
 	static int posX = 0;
 	static int posY = 0;
 
+	static boolean[][] screenInvert = new boolean[16][32];
+
+	private static final Object invertLock = new Object();
+	static int[] screenInvertX = new int[0];
+	static int[] screenInvertY = new int[0];
+
 	static String stringCursorOff = "";
 	static String stringCursorOn = "";
 
 	public static void blankLine(int line) {
 		char[] lineData = new char[32];
 		char[] lineData2 = new char[32];
+		screenInvert[line] = new boolean[32];
 		for(int i = 0; i < 32; i++) {
 			lineData[i] = ' ';
 			lineData2[i] = ' ';
 		}
 		screenCursorOff[line] = lineData;
 		screenCursorOn[line] = lineData2;
+		refreshInvert();
 		refreshCursor();
 	}
 
@@ -68,6 +77,8 @@ public class CRTDemoMain extends OpenGLMain {
 		scrollUp();
 		screenCursorOff[posY][posX] = c;
 		screenCursorOn[posY][posX] = c;
+		screenInvert[posY][posX] = c == 'o';
+		refreshInvert();
 		refreshCursor();
 	}
 
@@ -79,6 +90,40 @@ public class CRTDemoMain extends OpenGLMain {
 	public static void nextLine() {
 		posX = 31;
 		moveForward();
+	}
+
+	private static class Point2D {
+		public final int x;
+		public final int y;
+
+		public Point2D(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+	}
+
+	public static synchronized void refreshInvert() {
+		ArrayList<Point2D> invertP = new ArrayList<>();
+
+		for(int y = 0; y < 16; y++) {
+			boolean[] curInvertRow = screenInvert[y];
+			for(int x = 0; x < 32; x++) {
+				if(curInvertRow[x])
+					invertP.add(new Point2D(x, y));
+			}
+		}
+
+		int[] invX = new int[invertP.size()];
+		int[] invY = new int[invertP.size()];
+		for(int i = 0; i < invX.length; i++) {
+			invX[i] = invertP.get(i).x;
+			invY[i] = invertP.get(i).y;
+		}
+
+		synchronized (invertLock) {
+			screenInvertX = invX;
+			screenInvertY = invY;
+		}
 	}
 
 	public static void moveForward() {
@@ -110,9 +155,11 @@ public class CRTDemoMain extends OpenGLMain {
 		for(int i = mov; i < 16; i++) {
 			screenCursorOff[i - mov] = screenCursorOff[i];
 			System.arraycopy(screenCursorOff[i - mov], 0, screenCursorOn[i - mov], 0, 32);
+			screenInvert[i - mov] = screenInvert[i];
 		}
 		for(int i = 16 - mov; i < 16; i++)
 			blankLine(i);
+		refreshInvert();
 		refreshCursor();
 	}
 
@@ -375,6 +422,25 @@ public class CRTDemoMain extends OpenGLMain {
 					actualDrawData = stringCursorOff;
 
 				font.drawString(0, 0, actualDrawData, Color.green);
+
+				GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+				synchronized (invertLock) {
+					GL11.glColorMask(false, true, false, false);
+					GL11.glBlendFunc(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ONE_MINUS_DST_COLOR);
+					GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+					GL11.glBegin(GL11.GL_QUADS);
+					for (int i = 0; i < screenInvertX.length; i++) {
+						int invX = screenInvertX[i];
+						int invY = screenInvertY[i];
+						GL11.glVertex3f(21 * invX, 32 * invY, 0.0f);
+						GL11.glVertex3f(21 * (invX + 1), 32 * invY, 0.0f);
+						GL11.glVertex3f(21 * (invX + 1), 32 * (invY + 1), 0.0f);
+						GL11.glVertex3f(21 * invX, 32 * (invY + 1), 0.0f);
+					}
+					GL11.glEnd();
+					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+					GL11.glColorMask(true, true, true, true);
+				}
 
 				for(int i = 0; i < shaders.length; i++) {
 					OpenGLMain.flipBuffers(shaders[i]);
