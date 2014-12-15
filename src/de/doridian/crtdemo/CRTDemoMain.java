@@ -449,9 +449,8 @@ public class CRTDemoMain extends OpenGLMain {
 					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				}
 
-				for(int i = 0; i < shaders.length; i++) {
-					OpenGLMain.flipBuffers(shaders[i]);
-				}
+				for(MainShader shader : shaders)
+					OpenGLMain.flipBuffers(shader);
 			}
 		});
 	}
