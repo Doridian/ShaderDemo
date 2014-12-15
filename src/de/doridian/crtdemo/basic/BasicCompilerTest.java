@@ -21,6 +21,11 @@ public class BasicCompilerTest {
             }
 
             @Override
+            public int readChar() {
+                return readLine().charAt(0);
+            }
+
+            @Override
             public void clearLine(int line) {
 
             }
