@@ -434,9 +434,8 @@ public class CRTDemoMain extends OpenGLMain {
 
 				GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 				synchronized (invertLock) {
-					GL11.glColorMask(false, true, false, false);
 					GL11.glBlendFunc(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ONE_MINUS_SRC_COLOR);
-					GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+					GL11.glColor4f(0.0f, 1.0f, 0.0f, 0.0f);
 					GL11.glBegin(GL11.GL_QUADS);
 					for (int i = 0; i < screenInvertX.length; i++) {
 						int invX = screenInvertX[i];
@@ -448,7 +447,6 @@ public class CRTDemoMain extends OpenGLMain {
 					}
 					GL11.glEnd();
 					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-					GL11.glColorMask(true, true, true, true);
 				}
 
 				for(int i = 0; i < shaders.length; i++) {
