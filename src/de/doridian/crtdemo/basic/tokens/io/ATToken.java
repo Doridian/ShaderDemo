@@ -6,6 +6,6 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class ATToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        return prefix + "$io.setCursor(" + parametersSplitDetailed[0].subParams[0] + ", " + parametersSplitDetailed[1].subParams[0] + ");";
+        return prefix + "$io.setCursor(" + getAsAssignmentParameters(0) + ");";
     }
 }

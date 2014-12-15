@@ -6,6 +6,6 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class CLLToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        return prefix + "$io.clearLine(" + parametersSplitDetailed[0].subParams[0] + ");";
+        return prefix + "$io.clearLine(" + getAsAssignmentParameters(0) + ");";
     }
 }
