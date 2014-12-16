@@ -26,7 +26,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class CRTDemoMain extends OpenGLMain {
 	static int promptInputAllowed = 0;
 
-	static Integer promptCharInput = -1;
+	static final Object promptCharInputLock = new Object();
+	static volatile Integer promptCharInput = -1;
 
 	static boolean cursorBlinkVisible = false;
 	static String promptInput = "";
@@ -183,15 +184,12 @@ public class CRTDemoMain extends OpenGLMain {
 
 		@Override
 		public synchronized int readChar() {
-			promptCharInput = null;
-			try {
-				while(promptCharInput == null)
-					Thread.sleep(10);
+			synchronized (promptCharInputLock) {
+				if(promptCharInput == null)
+					return -1;
 				int ret = promptCharInput;
-				promptCharInput = -1;
+				promptCharInput = null;
 				return ret;
-			} catch (InterruptedException e) {
-				return -1;
 			}
 		}
 
@@ -397,9 +395,11 @@ public class CRTDemoMain extends OpenGLMain {
 
 			@Override
 			public void keyPressed(int keyCode, char keyChar) {
-				if(promptCharInput == null) {
-					promptCharInput = (keyChar == 0) ? (keyCode | 0x80000000) : keyChar;
-					return;
+				synchronized (promptCharInputLock) {
+					if (promptCharInput == null) {
+						promptCharInput = (keyChar == 0) ? (keyCode | 0x80000000) : keyChar;
+						return;
+					}
 				}
 
 				if(promptInputAllowed == 0)
