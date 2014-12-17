@@ -409,6 +409,7 @@ public class CRTDemoMain extends OpenGLMain {
 					if(promptInput.length() > 0) {
 						promptInput = promptInput.substring(0, promptInput.length() - 1);
 						if(--posX < 0) {
+							posX = 31;
 							if(--posY < 0) {
 								posY = 0;
 								return;
