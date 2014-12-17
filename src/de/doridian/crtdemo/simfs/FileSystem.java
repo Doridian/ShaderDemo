@@ -26,7 +26,6 @@ public class FileSystem implements IFileSystem {
     public final DirectoryData rootDirectory;
 
     private final ConcurrentMap<Integer, Cluster> clusterWeakHashMap = new MapMaker().weakValues().makeMap();
-    private final ConcurrentMap<Integer, AbstractData> dataWeakHashMap = new MapMaker().weakValues().makeMap();
 
     private FileSystem(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
         this.clusterSize = clusterSize;
@@ -161,7 +160,6 @@ public class FileSystem implements IFileSystem {
         cluster.writeAttributes();
 
         clusterWeakHashMap.remove(cluster.location);
-        dataWeakHashMap.remove(cluster.location);
     }
 
     public static class NotValidDataException extends IOException {
@@ -169,9 +167,6 @@ public class FileSystem implements IFileSystem {
     }
 
     public AbstractData readData(DirectoryData parent, int startCluster) throws IOException {
-        if(dataWeakHashMap.containsKey(startCluster))
-            return dataWeakHashMap.get(startCluster);
-
         Cluster firstCluster = getCluster(startCluster);
         firstCluster.readAttributes();
         if(!firstCluster.hasAllAttributes(Cluster.ATTRIBUTE_FIRST | Cluster.ATTRIBUTE_ALLOCATED))
@@ -187,8 +182,6 @@ public class FileSystem implements IFileSystem {
         data.lastClusterIndex = -1;
         data.attributeCluster = firstCluster;
         data.parent = parent;
-
-        dataWeakHashMap.put(startCluster, data);
 
         return data;
     }
@@ -209,8 +202,6 @@ public class FileSystem implements IFileSystem {
             data.attributeCluster = allocateCluster(false);
             data.attributeCluster.setAttribute(Cluster.ATTRIBUTE_FIRST, true);
             data.attributeCluster.setAttribute(data.getSetAttributes(), true);
-
-            dataWeakHashMap.put(data.attributeCluster.location, data);
         }
 
         if(data.attributesDirty) {
