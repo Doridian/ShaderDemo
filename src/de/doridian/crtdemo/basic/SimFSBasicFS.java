@@ -18,4 +18,37 @@ public class SimFSBasicFS implements BasicFS {
         fs.setCWD(file.getParent());
         return new String(file.readFully(), "ASCII");
     }
+
+    @Override
+    public BasicFSFile openFile(String fileName) throws IOException {
+        return new SimFSBasicFSFile((IFileData)fs.getFile(fileName));
+    }
+
+    public class SimFSBasicFSFile implements BasicFSFile {
+        private final IFileData fsFile;
+
+        public SimFSBasicFSFile(IFileData fsFile) {
+            this.fsFile = fsFile;
+        }
+
+        @Override
+        public void setLength(int len) throws IOException {
+            fsFile.setLength(len);
+        }
+
+        @Override
+        public String readLine() throws IOException {
+            return fsFile.readLine();
+        }
+
+        @Override
+        public void writeLine(String line) throws IOException {
+            fsFile.writeBytes(line + "\n");
+        }
+
+        @Override
+        public void close() throws IOException {
+            fsFile.close();
+        }
+    }
 }
