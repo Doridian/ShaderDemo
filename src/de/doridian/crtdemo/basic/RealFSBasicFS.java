@@ -8,12 +8,12 @@ import java.io.RandomAccessFile;
 public class RealFSBasicFS implements BasicFS {
     @Override
     public String getFileContents(String fileName) throws IOException {
-        return Util.readFile("data/" + fileName);
+        return Util.readFile("data/fssrc/C/" + fileName);
     }
 
     @Override
     public BasicFSFile openFile(String fileName) throws IOException {
-        return new RealFSBasicFSFile(new RandomAccessFile("data/" + fileName, "rw"));
+        return new RealFSBasicFSFile(new RandomAccessFile("data/fssrc/C/" + fileName, "rw"));
     }
 
     public static class RealFSBasicFSFile implements BasicFSFile {

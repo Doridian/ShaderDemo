@@ -22,6 +22,7 @@ public class LETToken extends AbstractToken {
 
                 return prefix + varName + " = new " + program.getVarType(varName) + "[" + arraySize + "];";
             } else {
+                program.addVariable(varName, false);
                 String varType = program.getVarType(varName);
                 switch (varType) {
                     case "String":

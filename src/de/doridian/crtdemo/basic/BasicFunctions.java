@@ -6,6 +6,8 @@ public class BasicFunctions {
     private BasicFunctions() { }
 
     public static int LEN(String str) {
+        if(str == null)
+            return -1;
         return str.length();
     }
 
