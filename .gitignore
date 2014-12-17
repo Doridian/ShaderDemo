@@ -16,4 +16,6 @@ hs_err_pid*
 *.iml
 /target
 
-/data
+/data/filesystem
+/data/compiled
+/data/tmp

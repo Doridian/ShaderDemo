@@ -1,0 +1,9 @@
+110 LET I = 0
+120 LET I = I + 1
+125 LET S$ = "hi"
+126 LET S$ = "" + I + "," + S$ + "\n"
+127 REM SLEEP 500
+130 PRINT S$
+140 IF I < 30 THEN GOTO 120
+
+145 PRINT "\n"

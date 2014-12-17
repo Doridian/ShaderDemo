@@ -1,0 +1,5 @@
+410 INPUT "Enter word: ", S$
+420 IF LEFT$(S$, 1) = "M" THEN GOTO 430 ELSE GOTO 440
+430 PRINT "We have M.*\n"
+
+440 PRINT "\n"
