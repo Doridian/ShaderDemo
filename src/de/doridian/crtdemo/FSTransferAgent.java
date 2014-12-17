@@ -10,14 +10,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class FSTransferAgent {
-    private static void transferFile(IDirectoryData dir, File src) {
-        try {
-            IFileData file = dir.createFile(src.getName());
-            file.write(Util.readFile(src).getBytes("ASCII"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(0);
-        }
+    private static void transferFile(IDirectoryData dir, File src) throws IOException {
+        IFileData file = dir.createFile(src.getName());
+        file.write(Util.readFile(src).getBytes("ASCII"));
     }
 
     private static void transferFolder(IDirectoryData dir, File folder) throws IOException {
