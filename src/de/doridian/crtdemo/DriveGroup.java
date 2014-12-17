@@ -5,6 +5,7 @@ import de.doridian.crtdemo.simfs.interfaces.IAbstractData;
 import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.TreeMap;
@@ -15,18 +16,21 @@ public class DriveGroup {
 
     private final File folder;
 
-    public DriveGroup(File folder) throws IOException {
-        this.folder = folder;
-
-        for(File file : folder.listFiles()) {
-            if(file.getName().length() != 1)
-                continue;
-            drives.put(file.getName().charAt(0), FileSystem.read(new RandomAccessFile(file, "rw")));
+    private static class FSFilenameFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.length() == 4 && name.toLowerCase().endsWith(".fs");
         }
     }
 
-    public void addFileSystem(char letter, int clusterSize, int numClusters) throws IOException {
-        FileSystem.create(clusterSize, numClusters, new RandomAccessFile(new File(folder, ""+letter), "rw"));
+    public DriveGroup(File folder) throws IOException {
+        this.folder = folder;
+
+        for(File file : folder.listFiles(new FSFilenameFilter())) {
+            if(file.isDirectory())
+                continue;
+            drives.put(file.getName().charAt(0), FileSystem.read(new RandomAccessFile(file, "rw")));
+        }
     }
 
     public IFileSystem getDrive(char driveLetter) {

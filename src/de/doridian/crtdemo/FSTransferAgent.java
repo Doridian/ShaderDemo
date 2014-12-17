@@ -6,6 +6,7 @@ import de.doridian.crtdemo.simfs.interfaces.IFileData;
 import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -35,18 +36,25 @@ public class FSTransferAgent {
         }
     }
 
-    public static void initAllFS() throws IOException {
-        File baseFolder = new File("data/fssrc");
-        for(File subFolder : baseFolder.listFiles()) {
-            if(ignoreFile(subFolder))
-                continue;
-            if(subFolder.isDirectory())
-                transferFolder(initFS(subFolder).getRootDirectory(), subFolder);
+    private static class FSMetaFilenameFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.toLowerCase().endsWith(".fsmeta");
         }
     }
 
-    private static IFileSystem initFS(File folder) throws IOException {
-        String[] metaArray = Util.readFile(new File(folder, "../" + folder.getName() + ".FSMETA")).split("[\r\n]+");
+    public static void initAllFS() throws IOException {
+        File baseFolder = new File("data/fssrc");
+        for(File subFolder : baseFolder.listFiles(new FSMetaFilenameFilter())) {
+            if(ignoreFile(subFolder) || subFolder.isDirectory())
+                continue;
+            initFS(subFolder);
+        }
+    }
+
+    private static void initFS(File fsMeta) throws IOException {
+        String[] metaArray = Util.readFile(fsMeta).split("[\r\n]+");
+        String fsName = fsMeta.getName().substring(0, fsMeta.getName().lastIndexOf('.'));
         int clusterCount = -1;
         int clusterSize = -1;
         for(String meta : metaArray) {
@@ -54,30 +62,31 @@ public class FSTransferAgent {
                 continue;
             int colonIdx = meta.indexOf(':');
             if(colonIdx < 0)
-                throw new RuntimeException("Invalid line in FS.META");
+                throw new RuntimeException("Invalid line in FS META");
             String mValue = meta.substring(colonIdx + 1).trim();
             switch (meta.substring(0, colonIdx).trim().toUpperCase()) {
                 case "CLUSTERSIZE":
                     if(clusterSize != -1)
-                        throw new RuntimeException("Invalid line in FS.META");
+                        throw new RuntimeException("Invalid line in FS META");
                     clusterSize = Integer.parseInt(mValue);
                     if(clusterSize == -1)
-                        throw new RuntimeException("Invalid line in FS.META");
+                        throw new RuntimeException("Invalid line in FS META");
                     break;
                 case "CLUSTERCOUNT":
                     if(clusterCount != -1)
-                        throw new RuntimeException("Invalid line in FS.META");
+                        throw new RuntimeException("Invalid line in FS META");
                     clusterCount = Integer.parseInt(mValue);
                     if(clusterCount == -1)
-                        throw new RuntimeException("Invalid line in FS.META");
+                        throw new RuntimeException("Invalid line in FS META");
                     break;
                 default:
-                    throw new RuntimeException("Invalid line in FS.META");
+                    throw new RuntimeException("Invalid line in FS META");
             }
         }
-        File fsFile = new File("data/filesystem/" + folder.getName());
+        File fsFile = new File("data/filesystem/" + fsName + ".fs");
         RandomAccessFile ranAF = new RandomAccessFile(fsFile, "rw");
         ranAF.setLength(0);
-        return FileSystem.create(clusterSize, clusterCount, ranAF);
+        IFileSystem fs = FileSystem.create(clusterSize, clusterCount, ranAF);
+        transferFolder(fs.getRootDirectory(), new File(fsMeta.getParentFile(), fsName));
     }
 }
