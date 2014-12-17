@@ -19,8 +19,6 @@ public class FileSystem implements IFileSystem {
     public final int clusterSize; //unsigned short
     public final int numClusters; //unsigned short
 
-    private IDirectoryData cwd;
-
     final RandomAccessFile randomAccessFile;
 
     public final DirectoryData rootDirectory;
@@ -45,7 +43,6 @@ public class FileSystem implements IFileSystem {
         }
 
         this.rootDirectory = rootDirectory;
-        this.cwd = rootDirectory;
     }
 
     @Override
@@ -59,26 +56,11 @@ public class FileSystem implements IFileSystem {
     }
 
     @Override
-    public void setCWD(IDirectoryData cwd) throws IOException {
-        if(cwd == null)
-            this.cwd = rootDirectory;
-        else
-            this.cwd = cwd;
-    }
-
-    @Override
-    public IDirectoryData getCWD() throws IOException {
-        return cwd;
-    }
-
-    @Override
     public IAbstractData getFile(String name) throws IOException {
-        IAbstractData baseDir;
-        if(name.charAt(0) == PATH_SEPARATOR) {
+        if(name.charAt(0) == PATH_SEPARATOR)
             name = name.substring(1);
-            baseDir = rootDirectory;
-        } else
-            baseDir = cwd;
+
+        IAbstractData baseDir = rootDirectory;
 
         String[] pathComponents = name.split(PATH_SEPARATOR + "+");
         for(String pathComponent : pathComponents) {
