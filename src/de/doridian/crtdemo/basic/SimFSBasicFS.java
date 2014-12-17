@@ -24,7 +24,7 @@ public class SimFSBasicFS implements BasicFS {
         return new SimFSBasicFSFile((IFileData)fs.getFile(fileName));
     }
 
-    public class SimFSBasicFSFile implements BasicFSFile {
+    public static class SimFSBasicFSFile implements BasicFSFile {
         private final IFileData fsFile;
 
         public SimFSBasicFSFile(IFileData fsFile) {

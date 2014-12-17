@@ -16,7 +16,7 @@ public class RealFSBasicFS implements BasicFS {
         return new RealFSBasicFSFile(new RandomAccessFile("data/" + fileName, "rw"));
     }
 
-    public class RealFSBasicFSFile implements BasicFSFile {
+    public static class RealFSBasicFSFile implements BasicFSFile {
         private final RandomAccessFile ranAF;
 
         public RealFSBasicFSFile(RandomAccessFile ranAF) {
