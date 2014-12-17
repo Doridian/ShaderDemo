@@ -1,8 +1,7 @@
 package de.doridian.crtdemo;
 
-import de.doridian.crtdemo.basic.BasicFS;
-import de.doridian.crtdemo.basic.SimFSBasicFS;
-import de.doridian.crtdemo.simfs.interfaces.IFileData;
+import de.doridian.jbasic.BasicFS;
+import de.doridian.jsimfs.interfaces.IFileData;
 
 import java.io.IOException;
 

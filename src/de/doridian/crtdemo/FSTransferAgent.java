@@ -1,9 +1,9 @@
 package de.doridian.crtdemo;
 
-import de.doridian.crtdemo.simfs.FileSystem;
-import de.doridian.crtdemo.simfs.interfaces.IDirectoryData;
-import de.doridian.crtdemo.simfs.interfaces.IFileData;
-import de.doridian.crtdemo.simfs.interfaces.IFileSystem;
+import de.doridian.jsimfs.FileSystem;
+import de.doridian.jsimfs.interfaces.IDirectoryData;
+import de.doridian.jsimfs.interfaces.IFileData;
+import de.doridian.jsimfs.interfaces.IFileSystem;
 
 import java.io.File;
 import java.io.FilenameFilter;
