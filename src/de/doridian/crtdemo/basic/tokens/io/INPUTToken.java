@@ -6,7 +6,7 @@ import de.doridian.crtdemo.basic.tokens.AbstractToken;
 public class INPUTToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        String variable = parametersSplitDetailed[parametersSplitDetailed.length - 1].subParams[0].getAsParameter();
+        String variable = parametersSplitDetailed[parametersSplitDetailed.length - 1].getAsParameter();
 
         String func = " = $io.readLine();";
         if(variable.indexOf('$') < 0)

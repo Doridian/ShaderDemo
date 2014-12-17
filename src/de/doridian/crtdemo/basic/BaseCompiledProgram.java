@@ -1,7 +1,9 @@
 package de.doridian.crtdemo.basic;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -44,6 +46,39 @@ public abstract class BaseCompiledProgram {
         return $io.getLines();
     }
 
+    private ArrayList<BasicFS.BasicFSFile> openFiles = new ArrayList<>();
+
+    public int $FS_FOPEN(String fileName) throws IOException {
+        synchronized (openFiles) {
+            openFiles.add($fs.openFile(fileName));
+            return openFiles.size() - 1;
+        }
+    }
+
+    public void $FS_FCLOSE(int hdl) throws IOException {
+        BasicFS.BasicFSFile file;
+        synchronized (openFiles) {
+            file = openFiles.remove(hdl);
+        }
+        file.close();
+    }
+
+    public String $FS_READLN(int hdl) throws IOException {
+        BasicFS.BasicFSFile file;
+        synchronized (openFiles) {
+            file = openFiles.get(hdl);
+        }
+        return file.readLine();
+    }
+
+    public void $FS_WRITELN(int hdl, String str) throws IOException {
+        BasicFS.BasicFSFile file;
+        synchronized (openFiles) {
+            file = openFiles.get(hdl);
+        }
+        file.writeLine(str);
+    }
+
     protected ConcurrentLinkedQueue<Integer> $callQueue = null;
     protected ConcurrentLinkedQueue<LoopLines> $loopQueue = null;
 
@@ -70,6 +105,7 @@ public abstract class BaseCompiledProgram {
         this.$loopQueue = new ConcurrentLinkedQueue<>();
 
         $nextLinePointer = $entryPoint;
+
         try {
             while ((line = $runNextLine()) >= 0);
             if(!$cleanExit)
@@ -80,6 +116,11 @@ public abstract class BaseCompiledProgram {
             e.printStackTrace();
             io.print("\nERROR ON LINE " + line + ": " + e.getMessage() + "\n");
         }
+
+        for(BasicFS.BasicFSFile file : openFiles) {
+            try { file.close(); } catch (Exception e) { }
+        }
+        openFiles.clear();
     }
 
     protected void $execSubFile(String file) throws IOException {

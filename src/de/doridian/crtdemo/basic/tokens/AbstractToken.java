@@ -13,6 +13,10 @@ import de.doridian.crtdemo.basic.tokens.flow.repeat_until_loop.REPEATToken;
 import de.doridian.crtdemo.basic.tokens.flow.repeat_until_loop.UNTILToken;
 import de.doridian.crtdemo.basic.tokens.flow.while_wend_loop.WENDToken;
 import de.doridian.crtdemo.basic.tokens.flow.while_wend_loop.WHILEToken;
+import de.doridian.crtdemo.basic.tokens.fs.FCLOSEToken;
+import de.doridian.crtdemo.basic.tokens.fs.FOPENToken;
+import de.doridian.crtdemo.basic.tokens.fs.FREADLNToken;
+import de.doridian.crtdemo.basic.tokens.fs.FWRITELNToken;
 import de.doridian.crtdemo.basic.tokens.io.*;
 import de.doridian.crtdemo.basic.tokens.misc.ENDToken;
 import de.doridian.crtdemo.basic.tokens.misc.LETToken;
@@ -43,6 +47,12 @@ public abstract class AbstractToken {
 
     static {
         tokens = new HashMap<>();
+
+        // FS
+        addToken(FCLOSEToken.class);
+        addToken(FOPENToken.class);
+        addToken(FREADLNToken.class);
+        addToken(FWRITELNToken.class);
 
         // I/O
         addToken(INPUTToken.class);
