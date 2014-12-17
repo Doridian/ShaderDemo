@@ -15,7 +15,6 @@ public class SimFSBasicFS implements BasicFS {
     @Override
     public String getFileContents(String fileName) throws IOException {
         IFileData file = (IFileData)fs.getFile(fileName);
-        fs.setCWD(file.getParent());
         return new String(file.readFully(), "ASCII");
     }
 
