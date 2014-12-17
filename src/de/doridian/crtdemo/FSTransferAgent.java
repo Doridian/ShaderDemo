@@ -15,14 +15,22 @@ public class FSTransferAgent {
         file.write(Util.readFile(src).getBytes("ASCII"));
     }
 
+    private static boolean ignoreFile(File file) {
+        switch (file.getName()) {
+            case ".":
+            case "..":
+                return true;
+        }
+        return false;
+    }
+
     private static void transferFolder(IDirectoryData dir, File folder) throws IOException {
         for(File subFolder : folder.listFiles()) {
-            if(subFolder.getName().charAt(0) == '.')
+            if(ignoreFile(subFolder))
                 continue;
-            if(subFolder.isDirectory()) {
-                IDirectoryData subDir = dir.createDirectory(subFolder.getName());
-                transferFolder(subDir, subFolder);
-            } else
+            if(subFolder.isDirectory())
+                transferFolder(dir.createDirectory(subFolder.getName()), subFolder);
+            else
                 transferFile(dir, subFolder);
         }
     }
@@ -30,17 +38,15 @@ public class FSTransferAgent {
     public static void initAllFS() throws IOException {
         File baseFolder = new File("data/fssrc");
         for(File subFolder : baseFolder.listFiles()) {
-            if(subFolder.getName().charAt(0) == '.')
+            if(ignoreFile(subFolder))
                 continue;
-            if(subFolder.isDirectory()) {
-                IFileSystem fs = initFS(subFolder);
-                transferFolder(fs.getRootDirectory(), subFolder);
-            }
+            if(subFolder.isDirectory())
+                transferFolder(initFS(subFolder).getRootDirectory(), subFolder);
         }
     }
 
     private static IFileSystem initFS(File folder) throws IOException {
-        String[] metaArray = Util.readFile(new File(folder, ".FSMETA")).split("[\r\n]+");
+        String[] metaArray = Util.readFile(new File(folder, "../" + folder.getName() + ".FSMETA")).split("[\r\n]+");
         int clusterCount = -1;
         int clusterSize = -1;
         for(String meta : metaArray) {
