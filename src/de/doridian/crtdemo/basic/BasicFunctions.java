@@ -10,6 +10,12 @@ public class BasicFunctions {
             return -1;
         return str.length();
     }
+    public static int LEN(Object[] array) {
+        return array.length;
+    }
+    public static int LEN(int[] array) {
+        return array.length;
+    }
 
     public static String LEFT$(String str, int num) {
         return str.substring(0, num);
@@ -38,12 +44,5 @@ public class BasicFunctions {
     }
     public static String RTRIM$(String s) {
         return _RTRIM.matcher(s).replaceAll("");
-    }
-
-    public static int ARRAYLEN(Object[] array) {
-        return array.length;
-    }
-    public static int ARRAYLEN(int[] array) {
-        return array.length;
     }
 }

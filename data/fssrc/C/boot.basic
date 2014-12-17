@@ -2,6 +2,11 @@
 02 REM DO LOOP {WHILE/UNTIL} {COND] IS TAIL CONTROLLED
 03 REM TODO: ADD FOPEN(NAME, r/w). FINPUT(). FPRINT(). FCLOSE().
 
-#include test_fs.basic
+#include test_1.basic
+#include test_2.basic
+#include test_3.basic
+#include test_4.basic
+#include test_5.basic
+#include test_6.basic
 
 9999 END
