@@ -99,6 +99,8 @@ public class FileSystem implements IFileSystem {
     }
 
     public static IFileSystem create(int clusterSize, int numClusters, RandomAccessFile file) throws IOException {
+        if(clusterSize < 1 || numClusters < 1 || clusterSize > 65535 || numClusters > 65535)
+            throw new IllegalArgumentException("ClusterSize or NumClusters out of range (1 - 65535)");
         file.setLength(HEADER_SIZE);
         file.seek(0);
         file.writeShort(clusterSize);
@@ -110,6 +112,8 @@ public class FileSystem implements IFileSystem {
         file.seek(0);
         int clusterSize = file.readUnsignedShort();
         int numClusters = file.readUnsignedShort();
+        if(clusterSize < 1 || numClusters < 1 || clusterSize > 65535 || numClusters > 65535)
+            throw new IllegalArgumentException("ClusterSize or NumClusters out of range (1 - 65535)");
         return new FileSystem(clusterSize, numClusters, file);
     }
 

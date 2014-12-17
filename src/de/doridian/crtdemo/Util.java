@@ -8,9 +8,8 @@ public class Util {
 		return s.hasNext() ? s.next() : "";
 	}
 
-	public static String readFile(String _file) {
+	public static String readFile(File file) {
 		try {
-			File file = new File(_file);
 			FileInputStream fis = new FileInputStream(file);
 			byte[] data = new byte[(int) file.length()];
 			fis.read(data);
@@ -20,6 +19,10 @@ public class Util {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static String readFile(String _file) {
+		return readFile(new File(_file));
 	}
 
 	public static void writeFile(String _file, String content) {
