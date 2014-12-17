@@ -46,9 +46,7 @@ public class DriveGroup {
 
         if(fileName.length() >= 3) {
             char driveLetter = fileName.substring(0, 1).toUpperCase().charAt(0);
-            char colon = fileName.charAt(1);
-            char pathStep = fileName.charAt(2);
-            if(driveLetter >= 'A' && driveLetter <= 'Z' && colon == ':' && pathStep == FileSystem.PATH_SEPARATOR) {
+            if(driveLetter >= 'A' && driveLetter <= 'Z' && fileName.charAt(1) == ':' && fileName.charAt(2) == FileSystem.PATH_SEPARATOR) {
                 fileName = fileName.substring(2);
                 useDrive = driveLetter;
             }
