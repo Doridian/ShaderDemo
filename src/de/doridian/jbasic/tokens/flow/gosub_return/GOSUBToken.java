@@ -6,6 +6,6 @@ import de.doridian.jbasic.tokens.AbstractToken;
 public class GOSUBToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        return prefix + "$goto(" + getAsAssignmentParameters(0) + ");\n" + prefix + "$callQueue.add(" + line + ");";
+        return prefix + "$callQueue.push(" + line + ");\n" + prefix + "$goto(" + getAsAssignmentParameters(0) + ");";
     }
 }

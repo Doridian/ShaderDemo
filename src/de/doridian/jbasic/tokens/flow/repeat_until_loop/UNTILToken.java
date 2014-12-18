@@ -6,6 +6,6 @@ import de.doridian.jbasic.tokens.AbstractToken;
 public class UNTILToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        return prefix + "$goto($loopQueue.poll().start);";
+        return prefix + "$goto($loopQueue.pop().start);";
     }
 }

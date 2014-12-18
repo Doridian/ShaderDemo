@@ -255,7 +255,7 @@ public class CRTDemoMain extends OpenGLMain {
 	public static void main(String[] args) throws Exception {
 		blankScreen();
 
-		final int THREAD_SLEEP_DIVIDER = 1;
+		final int THREAD_SLEEP_DIVIDER = 100;
 
 		Thread basicThread = new Thread() {
 			private final BasicIO io = new CRTBasicIO();

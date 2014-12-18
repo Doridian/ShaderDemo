@@ -6,6 +6,6 @@ import de.doridian.jbasic.tokens.AbstractToken;
 public class RETURNToken extends AbstractToken {
     @Override
     public String getCode(String prefix) {
-        return prefix + "$gotoAfter($callQueue.poll());";
+        return prefix + "$gotoAfter($callQueue.pop());";
     }
 }

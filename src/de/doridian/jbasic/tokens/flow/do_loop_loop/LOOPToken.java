@@ -12,9 +12,9 @@ public class LOOPToken extends AbstractToken {
                 negate = true;
             else if(!parametersSplitDetailed[0].valueEquals("UNTIL"))
                 throw new SyntaxException("NOT WHILE NOR UNTIL");
-            addLine("\t\tif(" + getAsConditionalParameters(1, negate) + ")\n\t\t\t$goto($loopQueue.poll().start);");
+            addLine("\t\tif(" + getAsConditionalParameters(1, negate) + ")\n\t\t\t$goto($loopQueue.pop().start);");
         } else {
-            addLine("\t\t$goto($loopQueue.poll().start);");
+            addLine("\t\t$goto($loopQueue.pop().start);");
         }
     }
 

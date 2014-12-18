@@ -18,12 +18,12 @@ public class BREAKToken extends AbstractToken {
             if(brkCount > 1) {
                 for(int i = 0; i < brkCount; i++) {
                     brk.append(prefix);
-                    brk.append("$loopQueue.poll();\n");
+                    brk.append("$loopQueue.pop();\n");
                 }
             }
         }
         brk.append(prefix);
-        brk.append("$gotoAfter($loopQueue.poll().end);");
+        brk.append("$gotoAfter($loopQueue.pop().end);");
         return brk.toString();
     }
 }

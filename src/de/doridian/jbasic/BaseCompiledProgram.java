@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class BaseCompiledProgram {
@@ -78,8 +79,8 @@ public abstract class BaseCompiledProgram {
         file.writeLine(str);
     }
 
-    protected ConcurrentLinkedQueue<Integer> $callQueue = null;
-    protected ConcurrentLinkedQueue<LoopLines> $loopQueue = null;
+    protected ConcurrentLinkedDeque<Integer> $callQueue = null;
+    protected ConcurrentLinkedDeque<LoopLines> $loopQueue = null;
 
     protected BaseCompiledProgram(Class<? extends BaseCompiledProgram> clazz, double entryPoint) {
         $entryPoint = entryPoint;
@@ -100,13 +101,15 @@ public abstract class BaseCompiledProgram {
         this.$io = io;
         double line = 0;
 
-        this.$callQueue = new ConcurrentLinkedQueue<>();
-        this.$loopQueue = new ConcurrentLinkedQueue<>();
+        this.$callQueue = new ConcurrentLinkedDeque<>();
+        this.$loopQueue = new ConcurrentLinkedDeque<>();
 
         $nextLinePointer = $entryPoint;
 
         try {
-            while ((line = $runNextLine()) >= 0);
+            while ((line = $runNextLine()) >= 0) {
+                System.out.println("L " + line);
+            }
             if(!$cleanExit)
                 io.print("\n--- PROGRAM REACHED EOF ---\n");
             else
@@ -127,7 +130,7 @@ public abstract class BaseCompiledProgram {
     }
 
     protected void $addLoop(double start, double end) {
-        $loopQueue.add(new LoopLines(start, end));
+        $loopQueue.push(new LoopLines(start, end));
     }
 
     protected void $goto(Double line) {

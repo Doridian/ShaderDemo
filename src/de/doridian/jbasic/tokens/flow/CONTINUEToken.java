@@ -18,12 +18,12 @@ public class CONTINUEToken extends AbstractToken {
             if(cntCount > 1) {
                 for(int i = 0; i < cntCount; i++) {
                     cnt.append(prefix);
-                    cnt.append("$loopQueue.poll();\n");
+                    cnt.append("$loopQueue.pop();\n");
                 }
             }
         }
         cnt.append(prefix);
-        cnt.append("$goto($loopQueue.poll().start);");
+        cnt.append("$goto($loopQueue.pop().start);");
         return cnt.toString();
     }
 }
