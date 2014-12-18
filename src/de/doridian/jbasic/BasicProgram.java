@@ -165,8 +165,8 @@ public class BasicProgram {
     }
 
     private String getCode(String className) {
-        return  "import static de.doridian.crtdemo.basic.BasicFunctions.*;\n\n" +
-                "public class " + className + " extends de.doridian.crtdemo.basic.BaseCompiledProgram { \n" +
+        return  "import static " + BasicFunctions.class.getCanonicalName()  + ".*;\n\n" +
+                "public class " + className + " extends " + BaseCompiledProgram.class.getCanonicalName() + " { \n" +
                 "\tpublic " + className + "() {\n\t\tsuper(" + className + ".class, " + entryPoint + "f);\n\t}\n\n" +
                 variableCode + "\n" +
                 functionCode +
