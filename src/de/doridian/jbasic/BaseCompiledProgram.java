@@ -108,7 +108,7 @@ public abstract class BaseCompiledProgram {
 
         try {
             while ((line = $runNextLine()) >= 0) {
-                System.out.println("L " + line);
+                if($debug) System.out.println("L " + line);
             }
             if(!$cleanExit)
                 io.print("\n--- PROGRAM REACHED EOF ---\n");
