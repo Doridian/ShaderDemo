@@ -8,13 +8,13 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class BaseCompiledProgram {
-    private Float $nextLinePointer = null;
+    private Double $nextLinePointer = null;
     protected boolean $cleanExit = false;
 
-    protected final float $entryPoint;
+    protected final double $entryPoint;
 
-    protected final TreeSet<Float> $lineNumbers;
-    protected final HashMap<Float, Method> $lineMethods;
+    protected final TreeSet<Double> $lineNumbers;
+    protected final HashMap<Double, Method> $lineMethods;
 
     protected BasicIO $io;
     BasicFS $fs;
@@ -28,10 +28,10 @@ public abstract class BaseCompiledProgram {
     }
 
     public static class LoopLines {
-        public final float start;
-        public final float end;
+        public final double start;
+        public final double end;
 
-        public LoopLines(float start, float end) {
+        public LoopLines(double start, double end) {
             this.start = start;
             this.end = end;
         }
@@ -81,7 +81,7 @@ public abstract class BaseCompiledProgram {
     protected ConcurrentLinkedQueue<Integer> $callQueue = null;
     protected ConcurrentLinkedQueue<LoopLines> $loopQueue = null;
 
-    protected BaseCompiledProgram(Class<? extends BaseCompiledProgram> clazz, float entryPoint) {
+    protected BaseCompiledProgram(Class<? extends BaseCompiledProgram> clazz, double entryPoint) {
         $entryPoint = entryPoint;
         $lineNumbers = new TreeSet<>();
         $lineMethods = new HashMap<>();
@@ -89,7 +89,7 @@ public abstract class BaseCompiledProgram {
         for(Method m : clazz.getDeclaredMethods()) {
             String mName = m.getName();
             if(mName.startsWith("$LINE_")) {
-                float lineNumber = Float.parseFloat(mName.substring(6).replace('_', '.'));
+                double lineNumber = Double.parseDouble(mName.substring(6).replace('_', '.'));
                 $lineNumbers.add(lineNumber);
                 $lineMethods.put(lineNumber, m);
             }
@@ -98,7 +98,7 @@ public abstract class BaseCompiledProgram {
 
     public synchronized void $start(BasicIO io) {
         this.$io = io;
-        float line = 0;
+        double line = 0;
 
         this.$callQueue = new ConcurrentLinkedQueue<>();
         this.$loopQueue = new ConcurrentLinkedQueue<>();
@@ -126,29 +126,29 @@ public abstract class BaseCompiledProgram {
         new CodeParser($fs, file, $debug).compile().$start($io);
     }
 
-    protected void $addLoop(float start, float end) {
+    protected void $addLoop(double start, double end) {
         $loopQueue.add(new LoopLines(start, end));
     }
 
-    protected void $goto(Float line) {
+    protected void $goto(Double line) {
         if(line == null)
             $nextLinePointer = null;
         else
-            $goto((float)line);
+            $goto(line);
     }
 
-    protected void $goto(float line) {
+    protected void $goto(double line) {
         $nextLinePointer = $lineNumbers.ceiling(line);
     }
 
-    protected void $gotoAfter(float line) {
+    protected void $gotoAfter(double line) {
         $nextLinePointer = $lineNumbers.higher(line);
     }
 
-    private Float $runNextLine() throws Exception {
-        Float runLine = $nextLinePointer;
+    private Double $runNextLine() throws Exception {
+        Double runLine = $nextLinePointer;
         if(runLine == null)
-            return -1.0f;
+            return -1.0;
         $nextLinePointer = $lineNumbers.higher($nextLinePointer);
         Method lineMethod = $lineMethods.get(runLine);
         if(lineMethod != null)

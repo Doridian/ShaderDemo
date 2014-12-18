@@ -20,9 +20,9 @@ public class BasicProgram {
 
     private final boolean debug;
 
-    private float entryPoint = -1;
+    private double entryPoint = -1;
 
-    private TreeSet<Float> lineNumbers = new TreeSet<>();
+    private TreeSet<Double> lineNumbers = new TreeSet<>();
     private HashSet<String> definedVariables = new HashSet<>();
 
     public BasicProgram(boolean debug) {
@@ -146,18 +146,18 @@ public class BasicProgram {
         return null;
     }
 
-    private void addLineNumber(float line) {
+    private void addLineNumber(double line) {
         if(!lineNumbers.add(line))
             throw new AbstractToken.SyntaxException("Line " + Math.floor(line) + " used twice");
         if(lineNumbers.higher(line) != null)
             throw new AbstractToken.SyntaxException("Line " + Math.floor(line) + " appears after higher numbered line");
     }
 
-    public void addNoopLine(float line) {
+    public void addNoopLine(double line) {
         addLineNumber(line);
     }
 
-    public void addLine(float line, String code) {
+    public void addLine(double line, String code) {
         if(entryPoint < 0)
             entryPoint = line;
         addLineNumber(line);
