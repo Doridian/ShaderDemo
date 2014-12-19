@@ -53,4 +53,7 @@ public class BasicFunctions {
     public static String RTRIM$(String s) {
         return _RTRIM.matcher(s).replaceAll("");
     }
+    public static String TRIM$(String s) {
+        return s.trim();
+    }
 }

@@ -15,6 +15,8 @@ public class PRINTToken extends AbstractToken {
     }
 
     static String getPrintParameters(String prefix, AbstractParameter[] parameter, boolean invert, int start, int end) {
+        if(end <= start)
+            return "";
         String ret = "";
         for(int i = start; i < end; i++)
             ret += prefix + "$io.print(" + parameter[i].getAsParameter() + ", " + (invert ? "true" : "false") + ");\n";
