@@ -1,5 +1,6 @@
 package de.doridian.jbasic;
 
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public class BasicFunctions {
@@ -55,5 +56,11 @@ public class BasicFunctions {
     }
     public static String TRIM$(String s) {
         return s.trim();
+    }
+
+    private static final Random random = new Random();
+
+    public static int RAND(int min, int max) {
+        return min + random.nextInt(max - min);
     }
 }

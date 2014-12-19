@@ -215,7 +215,8 @@ public abstract class AbstractToken {
                     if(openBrackets++ == 0) {
                         preBracket = tmpStr;
                         tmpStr = new StringBuilder();
-                    }
+                    } else
+                        tmpStr.append('(');
                 } else if(c == ')') {
                     if(openBrackets <= 0)
                         throw new SyntaxException("CANNOT CLOSE NON-OPEN BRACKET");
@@ -223,7 +224,8 @@ public abstract class AbstractToken {
                         parsedParametersCurrentGroup.add(new BracketedParameter(preBracket.toString(), tmpStr.toString()));
                         tmpStr.setLength(0);
                         preBracket.setLength(0);
-                    }
+                    } else
+                        tmpStr.append(')');
                 } else if (c == '"' && openBrackets == 0) {
                     if (tmpStr.length() > 0)
                         throw new SyntaxException("MISSING COMMA IN PARAMETER STRING");
