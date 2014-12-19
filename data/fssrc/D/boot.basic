@@ -5,9 +5,13 @@
 102 PRINT CHR$(RAND(34, 124))
 103 NEXT
 
-104 PRINT "\n\nERRORS IN DATA STREAM.\nPROCESSING ABORTED\n"
+104 PRINT "\n\nERRORS IN DATA STREAM.\nATTEMPTING HALT\n"
+105 PRINT "HIDDEN PAYLOAD DISCOVERED...\n\n"
 
-
+106 PRINT "Murry yiffmas, Cody :3\n"
+107 PRINT "Master loves you a lot.\n"
+108 PRINT "May we meet for real and\n"
+109 PRINT "enjoy a lot of time together"
 
 9999 END
 
