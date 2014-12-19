@@ -8,7 +8,7 @@ public class BasicCompilerTest {
     public static void main(String[] args) throws Exception {
         final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
-        BaseCompiledProgram compiledProgram = new CodeParser(new RealFSBasicFS(), "boot.basic", true).compile();
+        BaseCompiledProgram compiledProgram = new CodeParser(new RealFSBasicFS(), "boot.basic").compile();
 
         compiledProgram.$start(new BasicIO() {
             @Override

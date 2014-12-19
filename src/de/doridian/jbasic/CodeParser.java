@@ -9,6 +9,10 @@ public class CodeParser {
     private final boolean debug;
     private final BasicFS fs;
 
+    public CodeParser(BasicFS fs, String fileName) throws IOException {
+        this(fs, fileName, System.getProperty("jbasic.debug").equalsIgnoreCase("true"));
+    }
+
     public CodeParser(BasicFS fs, String fileName, boolean debug) throws IOException {
         this.fs = fs;
         this.debug = debug;
