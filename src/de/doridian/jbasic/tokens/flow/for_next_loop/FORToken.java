@@ -58,14 +58,14 @@ public class FORToken extends AbstractToken {
         if(step == 0)
             throw new SyntaxException();
 
-        String comparator = ">=";
+        String comparator = ">";
         if(step < 0)
-            comparator = "<=";
+            comparator = "<";
 
         program.addVariable(variableName, false);
         addLine("\t\t" + variableName + " = " + initialExpression + " - (" + step + ");");
         double lineCode = line + 0.1;
-        program.addLine(lineCode, "\t\tif(" + variableName + " " + comparator + " " + toExpression + ") {\n\t\t\t$gotoAfter(" + endingToken.line + ");\n\t\t\treturn;\n\t\t}\n\t\t$addLoop(" + lineCode + ", " + endingToken.line + ");\n\t\t" + variableName + " += (" + step + ");");
+        program.addLine(lineCode,  "\t\t" + variableName + " += (" + step + ");\n\t\tif(" + variableName + " " + comparator + " " + toExpression + ") {\n\t\t\t$gotoAfter(" + endingToken.line + ");\n\t\t\treturn;\n\t\t}\n\t\t$addLoop(" + lineCode + ", " + endingToken.line + ");");
     }
 
     public Class<? extends AbstractToken> getEndingToken() {

@@ -18,12 +18,20 @@ public class BasicFunctions {
     }
 
     public static String LEFT$(String str, int num) {
+        if(num > str.length())
+            num = str.length();
         return str.substring(0, num);
     }
     public static String RIGHT$(String str, int num) {
+        if(num > str.length())
+            num = str.length();
         return str.substring(str.length() - num, str.length());
     }
     public static String MID$(String str, int start, int len) {
+        if(start >= str.length())
+            return "";
+        if(len + start > str.length())
+            len = str.length() - start;
         return str.substring(start, start + len);
     }
 
