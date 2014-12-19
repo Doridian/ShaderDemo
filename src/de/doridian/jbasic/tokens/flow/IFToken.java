@@ -48,9 +48,14 @@ public class IFToken extends AbstractToken {
                 break;
         }
 
-        ifExpression = "\t\tif(" + conditionExpression.trim() + ") {\n" + parseLine(ifExpression.trim()).getCode("\t\t\t") + "\n\t\t}";
-        if(!elseExpression.isEmpty())
-            elseExpression = " else {\n" + parseLine(elseExpression.trim()).getCode("\t\t\t") + "\n\t\t}";
+        AbstractToken token = parseLine(ifExpression.trim());
+        token.line = line;
+        ifExpression = "\t\tif(" + conditionExpression.trim() + ") {\n" + token.getCode("\t\t\t") + "\n\t\t}";
+        if(!elseExpression.isEmpty()) {
+            token = parseLine(elseExpression.trim());
+            token.line = line;
+            elseExpression = " else {\n" + token.getCode("\t\t\t") + "\n\t\t}";
+        }
 
         addLine(ifExpression + elseExpression);
     }
