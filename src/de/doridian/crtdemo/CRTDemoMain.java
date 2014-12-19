@@ -141,7 +141,8 @@ public class CRTDemoMain extends OpenGLMain {
 			++posY;
 		}
 		refreshCursor();
-		scrollUp();
+		if(promptInputAllowed != 0)
+			scrollUp();
 	}
 
 	private static int cursorX = 0, cursorY = 0;
@@ -216,7 +217,7 @@ public class CRTDemoMain extends OpenGLMain {
 
 		@Override
 		public void setCursor(int x, int y) {
-			posX = x % 16;
+			posX = x % 32;
 			posY = y % 16;
 			refreshCursor();
 		}
