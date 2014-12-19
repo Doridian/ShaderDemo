@@ -36,6 +36,14 @@ public class CRTDemoMain extends OpenGLMain {
 	//32 rows, 16 lines
 	//670x510 screen area
 
+	private static void sleepCatch(int ms) {
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+
+		}
+	}
+
 	static char[][] screenCursorOff = new char[16][32];
 	static char[][] screenCursorOn = new char[16][32];
 	static int posX = 0;
@@ -212,6 +220,7 @@ public class CRTDemoMain extends OpenGLMain {
 				}
 				writeChar(c, invert);
 				moveForward();
+				sleepCatch(10);
 			}
 		}
 
