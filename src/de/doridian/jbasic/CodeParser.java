@@ -1,4 +1,5 @@
 package de.doridian.jbasic;
+
 import de.doridian.jbasic.tokens.AbstractToken;
 
 import java.io.IOException;
