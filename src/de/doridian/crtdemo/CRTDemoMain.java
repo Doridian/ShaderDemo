@@ -301,6 +301,7 @@ public class CRTDemoMain extends OpenGLMain {
 				} else {
 					try {
 						File fsDir = new File("data/filesystem");
+						fsDir.mkdirs();
 						LWJGLExtract.extractFile("C.fs", new File(fsDir, "C.fs"));
 					} catch (Exception e) {
 						e.printStackTrace();
