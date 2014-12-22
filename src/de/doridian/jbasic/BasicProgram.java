@@ -101,34 +101,29 @@ public class BasicProgram {
     }
 
     public BaseCompiledProgram compile() {
+        new File("data/tmp").mkdirs();
+        new File("data/compiled").mkdirs();
+
         String className = "CompileResult$$" + (++COMPILE_CTR);
         String code = getCode(className);
-        if(debug)
-            Util.writeFile("data/tmp/test.java", code);
+        Util.writeFile("data/tmp/" + className + ".java", code);
         File destDir = new File("data/compiled");
         destDir.mkdirs();
         File classFile = new File(destDir, className + ".class");
         classFile.delete();
 
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        String[] args = new String[] {
+            "-classpath", System.getProperty("java.class.path"),
+            "-sourcepath", "data/tmp",
+            "-d", "data/compiled",
+            "data/tmp/" + className + ".java"
+        };
+        int compileStatus = com.sun.tools.javac.Main.compile(args);
 
-        JavaFileObject jfo = new StringSourceJavaFileObject(className, code);
-        ArrayList<JavaFileObject> jfoList = new ArrayList<>();
-        jfoList.add(jfo);
+        if(!debug)
+            new File("data/tmp/" + className + ".java").delete();
 
-        Iterable<String> options = Arrays.asList("-d", destDir.getAbsolutePath());
-        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options, null, jfoList);
-
-        task.call();
-
-        boolean hasError = false;
-        for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
-            System.err.println(diagnostic.getLineNumber() + ": " + diagnostic.getMessage(null));
-            hasError = true;
-        }
-
-        if(hasError)
+        if(compileStatus != 0)
             return null;
 
         try {
