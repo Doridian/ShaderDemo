@@ -11,7 +11,7 @@ public class CodeParser {
     private final BasicFS fs;
 
     public CodeParser(BasicFS fs, String fileName) throws IOException {
-        this(fs, fileName, System.getProperty("jbasic.debug").equalsIgnoreCase("true"));
+        this(fs, fileName, System.getProperty("jbasic.debug", "").equalsIgnoreCase("true"));
     }
 
     public CodeParser(BasicFS fs, String fileName, boolean debug) throws IOException {

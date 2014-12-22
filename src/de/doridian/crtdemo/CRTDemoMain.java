@@ -263,6 +263,8 @@ public class CRTDemoMain extends OpenGLMain {
 	}
 
 	public static void main(String[] args) throws Exception {
+		LWJGLExtract.extractLibs();
+
 		blankScreen();
 
 		final int THREAD_SLEEP_DIVIDER = 100;
@@ -287,7 +289,7 @@ public class CRTDemoMain extends OpenGLMain {
 			}
 
 			public void run() {
-				if(System.getProperty("jsimfs.compile").equalsIgnoreCase("true")) {
+				if(System.getProperty("jsimfs.compile", "").equalsIgnoreCase("true")) {
 					System.out.println("Compiling JSimFS");
 					try {
 						FSTransferAgent.initAllFS();
