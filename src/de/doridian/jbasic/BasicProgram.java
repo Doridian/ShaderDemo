@@ -3,14 +3,12 @@ package de.doridian.jbasic;
 import de.doridian.crtdemo.Util;
 import de.doridian.jbasic.tokens.AbstractToken;
 
-import javax.tools.*;
+import javax.tools.SimpleJavaFileObject;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
 

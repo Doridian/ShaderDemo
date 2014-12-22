@@ -1,12 +1,12 @@
 package de.doridian.crtdemo;
 
+import de.doridian.crtdemo.shader.MainShader;
+import de.doridian.crtdemo.shader.OpenGLMain;
+import de.doridian.crtdemo.shader.ShaderProgram;
 import de.doridian.jbasic.BaseCompiledProgram;
 import de.doridian.jbasic.BasicFunctions;
 import de.doridian.jbasic.BasicIO;
 import de.doridian.jbasic.CodeParser;
-import de.doridian.crtdemo.shader.MainShader;
-import de.doridian.crtdemo.shader.OpenGLMain;
-import de.doridian.crtdemo.shader.ShaderProgram;
 import de.doridian.jsimfs.FileSystem;
 import de.doridian.jsimfs.interfaces.IFileData;
 import de.doridian.jsimfs.interfaces.IFileSystem;

@@ -32,7 +32,7 @@ public class LWJGLExtract {
 		try {
 			NATIVES_DIR.mkdirs();
 			for(String str : LWJGL_LIBS)
-				extractLibsInt(str);
+				extractFile(str, new File(NATIVES_DIR, str));
 			addLibDir("./" + NATIVES_DIR.getName() + "/");
 			System.out.println("Natives loaded!");
 		} catch (Throwable t) {
@@ -66,11 +66,10 @@ public class LWJGLExtract {
 		}
 	}
 
-	private static void extractLibsInt(String lib) throws Throwable {
-		File outLib = new File(NATIVES_DIR, lib);
+	public static void extractFile(String src, File outLib) throws Throwable {
 		if(outLib.exists())
 			return;
-		InputStream stream = LWJGLExtract.class.getResourceAsStream("/" + lib);
+		InputStream stream = LWJGLExtract.class.getResourceAsStream("/" + src);
 		if(stream == null)
 			return;
 		FileOutputStream fos = new FileOutputStream(outLib);

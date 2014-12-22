@@ -1,6 +1,7 @@
 package de.doridian.jbasic.tokens;
 
 import de.doridian.jbasic.BasicProgram;
+import de.doridian.jbasic.parameters.*;
 import de.doridian.jbasic.tokens.flow.*;
 import de.doridian.jbasic.tokens.flow.do_loop_loop.DOToken;
 import de.doridian.jbasic.tokens.flow.do_loop_loop.LOOPToken;
@@ -16,12 +17,11 @@ import de.doridian.jbasic.tokens.fs.FCLOSEToken;
 import de.doridian.jbasic.tokens.fs.FOPENToken;
 import de.doridian.jbasic.tokens.fs.FREADLNToken;
 import de.doridian.jbasic.tokens.fs.FWRITELNToken;
+import de.doridian.jbasic.tokens.io.*;
 import de.doridian.jbasic.tokens.misc.ENDToken;
 import de.doridian.jbasic.tokens.misc.LETToken;
 import de.doridian.jbasic.tokens.misc.NOOPToken;
 import de.doridian.jbasic.tokens.misc.SLEEPToken;
-import de.doridian.jbasic.parameters.*;
-import de.doridian.jbasic.tokens.io.*;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
