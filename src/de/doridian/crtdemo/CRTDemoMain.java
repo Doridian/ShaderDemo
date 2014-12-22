@@ -287,19 +287,16 @@ public class CRTDemoMain extends OpenGLMain {
 			}
 
 			public void run() {
-				try {
-					FSTransferAgent.initAllFS();
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.exit(0);
-					return;
+				if(System.getProperty("jsimfs.compile").equalsIgnoreCase("true")) {
+					System.out.println("Compiling JSimFS");
+					try {
+						FSTransferAgent.initAllFS();
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(0);
+						return;
+					}
 				}
-				/*FSTransferAgent.transferFile("boot.basic");
-				FSTransferAgent.transferFile("test_1.basic");
-				FSTransferAgent.transferFile("test_2.basic");
-				FSTransferAgent.transferFile("test_3.basic");
-				FSTransferAgent.transferFile("test_4.basic");
-				FSTransferAgent.transferFile("test_5.basic");*/
 
 				io.print("foxBIOS v0.1b\nCore booting");
 				printLoad('.', 3, 3000, " OK\n");
