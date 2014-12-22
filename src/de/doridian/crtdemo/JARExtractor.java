@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 
-public class LWJGLExtract {
+public class JARExtractor {
 	private static final String[] LWJGL_LIBS = {
 		"OpenAL32.dll",
 		"OpenAL64.dll",
@@ -32,7 +32,7 @@ public class LWJGLExtract {
 		try {
 			NATIVES_DIR.mkdirs();
 			for(String str : LWJGL_LIBS)
-				extractFile(str, new File(NATIVES_DIR, str));
+				extractFile(str, new File(NATIVES_DIR, str), false);
 			addLibDir("./" + NATIVES_DIR.getName() + "/");
 			System.out.println("Natives loaded!");
 		} catch (Exception e) {
@@ -66,10 +66,10 @@ public class LWJGLExtract {
 		}
 	}
 
-	public static void extractFile(String src, File outLib) throws Exception {
-		if(outLib.exists())
+	public static void extractFile(String src, File outLib, boolean overwrite) throws Exception {
+		if(outLib.exists() && !overwrite)
 			return;
-		InputStream stream = LWJGLExtract.class.getResourceAsStream("/" + src);
+		InputStream stream = JARExtractor.class.getResourceAsStream("/" + src);
 		if(stream == null)
 			return;
 		FileOutputStream fos = new FileOutputStream(outLib);

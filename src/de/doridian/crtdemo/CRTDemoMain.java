@@ -263,7 +263,7 @@ public class CRTDemoMain extends OpenGLMain {
 	}
 
 	public static void main(String[] args) throws Exception {
-		LWJGLExtract.extractLibs();
+		JARExtractor.extractLibs();
 
 		blankScreen();
 
@@ -302,7 +302,7 @@ public class CRTDemoMain extends OpenGLMain {
 					try {
 						File fsDir = new File("data/filesystem");
 						fsDir.mkdirs();
-						LWJGLExtract.extractFile("C.fs", new File(fsDir, "C.fs"));
+						JARExtractor.extractFile("C.fs", new File(fsDir, "C.fs"), true);
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.exit(0);
