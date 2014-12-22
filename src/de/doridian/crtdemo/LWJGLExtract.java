@@ -35,8 +35,8 @@ public class LWJGLExtract {
 				extractFile(str, new File(NATIVES_DIR, str));
 			addLibDir("./" + NATIVES_DIR.getName() + "/");
 			System.out.println("Natives loaded!");
-		} catch (Throwable t) {
-			t.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 			System.exit(1);
 		}
 	}
@@ -66,7 +66,7 @@ public class LWJGLExtract {
 		}
 	}
 
-	public static void extractFile(String src, File outLib) throws Throwable {
+	public static void extractFile(String src, File outLib) throws Exception {
 		if(outLib.exists())
 			return;
 		InputStream stream = LWJGLExtract.class.getResourceAsStream("/" + src);

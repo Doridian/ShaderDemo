@@ -298,6 +298,15 @@ public class CRTDemoMain extends OpenGLMain {
 						System.exit(0);
 						return;
 					}
+				} else {
+					try {
+						File fsDir = new File("data/filesystem");
+						LWJGLExtract.extractFile("C.fs", new File(fsDir, "C.fs"));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(0);
+						return;
+					}
 				}
 
 				io.print("foxBIOS v0.1b\nCore booting");
