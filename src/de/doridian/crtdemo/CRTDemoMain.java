@@ -267,7 +267,7 @@ public class CRTDemoMain extends OpenGLMain {
 
 		blankScreen();
 
-		final int THREAD_SLEEP_DIVIDER = 100;
+		final int THREAD_SLEEP_DIVIDER = 1;
 
 		Thread basicThread = new Thread() {
 			private final BasicIO io = new CRTBasicIO();
